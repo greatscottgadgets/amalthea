@@ -1,22 +1,21 @@
 EESchema Schematic File Version 4
-LIBS:amalthea_rev0-cache
-EELAYER 29 0
+EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 9
-Title "Amalthea USB Multitool"
+Title "Amalthea"
 Date "2019-10-20"
 Rev "r0"
 Comp "Great Scott Gadgets"
-Comment1 "Katherine J. Temkin"
+Comment1 "Based on LUNA"
 Comment2 ""
-Comment3 "Licensed under the CERN OHL v1.2"
+Comment3 "Licensed under CERN-OHL-P version 2"
 Comment4 ""
 $EndDescr
 $Sheet
 S 800  6600 1150 800 
-U 5DA7BAF4
+U 5DA7B3F4
 F0 "Power Supplies" 50
 F1 "power_supplies.sch" 50
 $EndSheet
