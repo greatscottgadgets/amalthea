@@ -1,11 +1,11 @@
 EESchema Schematic File Version 4
-LIBS:luna_rev0-cache
+LIBS:amalthea_rev0-cache
 EELAYER 29 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
 Sheet 5 9
-Title "LUNA: Downstream / Target / Analysis Section"
+Title "Amalthea: Downstream / Target / Analysis Section"
 Date "2019-10-20"
 Rev "r0"
 Comp "Great Scott Gadgets"
@@ -238,7 +238,7 @@ U 4 1 5DDE3D5A
 P 1650 2100
 F 0 "IC1" H 1620 283 50  0000 R CNN
 F 1 "ECP5-BGA256" H 1620 193 50  0000 R CNN
-F 2 "luna:lattice_cabga256" H -1550 5550 50  0001 L CNN
+F 2 "amalthea:lattice_cabga256" H -1550 5550 50  0001 L CNN
 F 3 "" H -2000 6500 50  0001 L CNN
 F 4 "FPGA - Field Programmable Gate Array ECP5; 12k LUTs; 1.1V" H -2000 6400 50  0001 L CNN "Description"
 F 5 "1.7" H -2000 6750 50  0001 L CNN "Height"

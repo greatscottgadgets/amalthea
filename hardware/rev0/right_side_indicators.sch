@@ -1,11 +1,11 @@
 EESchema Schematic File Version 4
-LIBS:luna_rev0-cache
+LIBS:amalthea_rev0-cache
 EELAYER 29 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
 Sheet 9 9
-Title "LUNA: Right Side I/O"
+Title "Amalthea: Right Side I/O"
 Date "2019-10-20"
 Rev "r0"
 Comp "Great Scott Gadgets"
@@ -31,7 +31,7 @@ U 5 1 5DF17723
 P 2150 2000
 F 0 "IC1" H 2120 208 50  0000 R CNN
 F 1 "ECP5-BGA256" H 2120 118 50  0000 R CNN
-F 2 "luna:lattice_cabga256" H -1050 5450 50  0001 L CNN
+F 2 "amalthea:lattice_cabga256" H -1050 5450 50  0001 L CNN
 F 3 "" H -1500 6400 50  0001 L CNN
 F 4 "FPGA - Field Programmable Gate Array ECP5; 12k LUTs; 1.1V" H -1500 6300 50  0001 L CNN "Description"
 F 5 "1.7" H -1500 6650 50  0001 L CNN "Height"

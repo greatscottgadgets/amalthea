@@ -1,11 +1,11 @@
 EESchema Schematic File Version 4
-LIBS:luna_rev0-cache
+LIBS:amalthea_rev0-cache
 EELAYER 29 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
 Sheet 3 9
-Title "LUNA: Configuration / Dev / Debug Section"
+Title "Amalthea: Configuration / Dev / Debug Section"
 Date "2019-10-20"
 Rev "r0"
 Comp "Great Scott Gadgets"
@@ -20,7 +20,7 @@ U 8 1 5DCABD39
 P 10500 2250
 F 0 "IC1" H 11350 2400 50  0000 R CNN
 F 1 "ECP5-BGA256" H 11350 2300 50  0000 R CNN
-F 2 "luna:lattice_cabga256" H 7300 5700 50  0001 L CNN
+F 2 "amalthea:lattice_cabga256" H 7300 5700 50  0001 L CNN
 F 3 "" H 6850 6650 50  0001 L CNN
 F 4 "FPGA - Field Programmable Gate Array ECP5; 12k LUTs; 1.1V" H 6850 6550 50  0001 L CNN "Description"
 F 5 "1.7" H 6850 6900 50  0001 L CNN "Height"
@@ -438,7 +438,7 @@ U 1 1 5DB28143
 P 5850 6650
 F 0 "J6" H 5600 7350 50  0000 R CNN
 F 1 "Conn_ARM_JTAG_SWD_10" H 5600 7250 50  0000 R CNN
-F 2 "luna:SWD_CONNECTOR_LARGE_BOX" H 5850 6650 50  0001 C CNN
+F 2 "amalthea:SWD_CONNECTOR_LARGE_BOX" H 5850 6650 50  0001 C CNN
 F 3 "http://infocenter.arm.com/help/topic/com.arm.doc.ddi0314h/DDI0314H_coresight_components_trm.pdf" V 5500 5400 50  0001 C CNN
 	1    5850 6650
 	-1   0    0    -1  
@@ -741,7 +741,7 @@ U 1 1 5DC7E70D
 P 1750 6650
 F 0 "J5" H 1450 7250 50  0000 R CNN
 F 1 "Conn_ARM_JTAG_SWD_10" V 1200 7050 50  0000 R CNN
-F 2 "luna:SWD_CONNECTOR_LARGE_BOX" H 1750 6650 50  0001 C CNN
+F 2 "amalthea:SWD_CONNECTOR_LARGE_BOX" H 1750 6650 50  0001 C CNN
 F 3 "http://infocenter.arm.com/help/topic/com.arm.doc.ddi0314h/DDI0314H_coresight_components_trm.pdf" V 1400 5400 50  0001 C CNN
 	1    1750 6650
 	-1   0    0    -1  

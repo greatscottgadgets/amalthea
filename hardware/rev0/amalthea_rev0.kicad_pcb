@@ -1109,7 +1109,7 @@
       (solder_mask_margin 0.75) (clearance 0.75))
   )
 
-  (module luna:usb_tools_logo (layer B.Cu) (tedit 0) (tstamp 5DDE0986)
+  (module amalthea:usb_tools_logo (layer B.Cu) (tedit 0) (tstamp 5DDE0986)
     (at 99.314 107.2515 270)
     (fp_text reference G*** (at 0 0 90) (layer B.SilkS) hide
       (effects (font (size 1.524 1.524) (thickness 0.3)) (justify mirror))
@@ -1184,7 +1184,7 @@
       (xy -0.24548 4.890133) (xy -0.207428 4.905692) (xy -0.164808 4.903848)) (layer B.SilkS) (width 0.01))
   )
 
-  (module luna:lattice_cabga256 (layer F.Cu) (tedit 5D3749C0) (tstamp 5DAF2454)
+  (module amalthea:lattice_cabga256 (layer F.Cu) (tedit 5D3749C0) (tstamp 5DAF2454)
     (at 115.316 88.9)
     (descr "256-Ball caBGA")
     (tags "Integrated Circuit")
@@ -2266,7 +2266,7 @@
     )
   )
 
-  (module luna:BGA-24_5x5_6.0x8.0mm (layer F.Cu) (tedit 5AECE41C) (tstamp 5DAED69C)
+  (module amalthea:BGA-24_5x5_6.0x8.0mm (layer F.Cu) (tedit 5AECE41C) (tstamp 5DAED69C)
     (at 119.507 76.2 270)
     (path /5DE77FE3/5DEA1FC4)
     (attr smd)
@@ -4488,7 +4488,7 @@
     )
   )
 
-  (module luna:SOD128 placed (layer F.Cu) (tedit 57C5F8DE) (tstamp 5DAEE687)
+  (module amalthea:SOD128 placed (layer F.Cu) (tedit 57C5F8DE) (tstamp 5DAEE687)
     (at 94.8055 76.6445 270)
     (path /5DDCCE15)
     (fp_text reference D1 (at 0 -0.5 90) (layer F.SilkS) hide
@@ -4752,7 +4752,7 @@
     )
   )
 
-  (module luna:SOD128 placed (layer F.Cu) (tedit 57C5F8DE) (tstamp 5DB08554)
+  (module amalthea:SOD128 placed (layer F.Cu) (tedit 57C5F8DE) (tstamp 5DB08554)
     (at 96.352 91.2495)
     (path /5DCD8026)
     (fp_text reference D8 (at 0 -0.5) (layer F.SilkS) hide
@@ -4978,7 +4978,7 @@
     )
   )
 
-  (module luna:CONN-Amphenol-UE27AC54100 (layer F.Cu) (tedit 5DAD34F5) (tstamp 5DB0E55C)
+  (module amalthea:CONN-Amphenol-UE27AC54100 (layer F.Cu) (tedit 5DAD34F5) (tstamp 5DB0E55C)
     (at 128.7145 75.311 90)
     (path /5DD6DEF2)
     (fp_text reference J3 (at 0.2 -4.3 90) (layer F.SilkS) hide
@@ -5015,14 +5015,14 @@
       (net 2 GND))
     (pad 5 thru_hole circle (at 6.55 2.71 90) (size 3.25 3.25) (drill 2.3) (layers *.Cu *.Mask)
       (net 2 GND))
-    (model ${KIPRJMOD}/../libraries/luna.3dshapes/UE27AC54100.step
+    (model ${KIPRJMOD}/../libraries/amalthea.3dshapes/UE27AC54100.step
       (at (xyz 0 0 0))
       (scale (xyz 1 1 1))
       (rotate (xyz 0 0 0))
     )
   )
 
-  (module luna:SWD_CONNECTOR_LARGE_BOX (layer F.Cu) (tedit 5DAD2BC7) (tstamp 5DAEF09B)
+  (module amalthea:SWD_CONNECTOR_LARGE_BOX (layer F.Cu) (tedit 5DAD2BC7) (tstamp 5DAEF09B)
     (at 132.842 101.981 180)
     (path /5DCAA6D2/5DC7E70D)
     (fp_text reference J5 (at 0 3.81) (layer F.SilkS) hide
@@ -5063,7 +5063,7 @@
     )
   )
 
-  (module luna:SWD_CONNECTOR_LARGE_BOX (layer F.Cu) (tedit 5DAD2BC7) (tstamp 5DAEF0D1)
+  (module amalthea:SWD_CONNECTOR_LARGE_BOX (layer F.Cu) (tedit 5DAD2BC7) (tstamp 5DAEF0D1)
     (at 132.842 107.95)
     (path /5DCAA6D2/5DB28143)
     (fp_text reference J6 (at 0 3.81) (layer F.SilkS) hide
@@ -5104,7 +5104,7 @@
     )
   )
 
-  (module luna:SMA-EDGE (layer F.Cu) (tedit 534AD186) (tstamp 5DDBB246)
+  (module amalthea:SMA-EDGE (layer F.Cu) (tedit 534AD186) (tstamp 5DDBB246)
     (at 122.174 66.548 270)
     (path /5E41D377)
     (fp_text reference J8 (at 1.99898 0 90) (layer F.SilkS)
@@ -5149,7 +5149,7 @@
       (net 134 "/Debug & Control Connections/USER_IO0"))
   )
 
-  (module luna:SMA-EDGE (layer F.Cu) (tedit 534AD186) (tstamp 5DB65182)
+  (module amalthea:SMA-EDGE (layer F.Cu) (tedit 534AD186) (tstamp 5DB65182)
     (at 109.728 66.548 270)
     (path /5E41DB94)
     (fp_text reference J9 (at 1.99898 0 90) (layer F.SilkS)
@@ -6078,7 +6078,7 @@
     )
   )
 
-  (module luna:SWITCH-FSMRA (layer F.Cu) (tedit 5DAD2C80) (tstamp 5DB64F70)
+  (module amalthea:SWITCH-FSMRA (layer F.Cu) (tedit 5DAD2C80) (tstamp 5DB64F70)
     (at 111.1125 114.885)
     (path /5E0E58AB)
     (fp_text reference SW1 (at 0 -2.032 180) (layer F.SilkS) hide
@@ -6111,7 +6111,7 @@
     )
   )
 
-  (module luna:SWITCH-FSMRA (layer F.Cu) (tedit 5DAD2C80) (tstamp 5DAF52EE)
+  (module amalthea:SWITCH-FSMRA (layer F.Cu) (tedit 5DAD2C80) (tstamp 5DAF52EE)
     (at 120.6625 114.8715)
     (path /5E0E6B65)
     (fp_text reference SW2 (at -0.127 -2.0955) (layer F.SilkS) hide
@@ -6144,7 +6144,7 @@
     )
   )
 
-  (module luna:SWITCH-FSMRA (layer F.Cu) (tedit 5DAD2C80) (tstamp 5DB74C59)
+  (module amalthea:SWITCH-FSMRA (layer F.Cu) (tedit 5DAD2C80) (tstamp 5DB74C59)
     (at 130.3145 114.885)
     (path /5E2B35A7)
     (fp_text reference SW3 (at -0.076 -1.9185) (layer F.SilkS) hide
@@ -6762,7 +6762,7 @@
   (gr_text "USB \nMultitool" (at 108.9025 107.2515) (layer B.SilkS) (tstamp 5DDE7F91)
     (effects (font (size 2.1 1.45) (thickness 0.3)) (justify mirror))
   )
-  (gr_text LUNA (at 121.2215 107.3785) (layer B.SilkS) (tstamp 5DDE0998)
+  (gr_text Amalthea (at 121.2215 107.3785) (layer B.SilkS) (tstamp 5DDE0998)
     (effects (font (size 5.25 4) (thickness 0.75)) (justify mirror))
   )
   (gr_text "Debug/Alt Port" (at 113.792 102.362) (layer B.SilkS) (tstamp 5DDC9427)
@@ -6893,7 +6893,7 @@
   (gr_text uC (at 124.079 101.346) (layer F.SilkS) (tstamp 5DB313A5)
     (effects (font (size 1 1) (thickness 0.15)))
   )
-  (gr_text LUNA (at 115.189 97.5995) (layer F.SilkS) (tstamp 5DB3139A)
+  (gr_text Amalthea (at 115.189 97.5995) (layer F.SilkS) (tstamp 5DB3139A)
     (effects (font (size 2.35 2) (thickness 0.3)))
   )
   (gr_text "USB \nMultitool" (at 121.412 97.536) (layer F.SilkS) (tstamp 5DB2FC89)

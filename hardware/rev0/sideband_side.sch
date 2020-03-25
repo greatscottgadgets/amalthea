@@ -1,11 +1,11 @@
 EESchema Schematic File Version 4
-LIBS:luna_rev0-cache
+LIBS:amalthea_rev0-cache
 EELAYER 29 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
 Sheet 4 9
-Title "LUNA: Sideband USB PHY"
+Title "Amalthea: Sideband USB PHY"
 Date "2019-10-20"
 Rev "r0"
 Comp "Great Scott Gadgets"
@@ -31,7 +31,7 @@ U 6 1 5DCE10A7
 P 1550 1900
 F 0 "IC1" H 1520 -167 50  0000 R CNN
 F 1 "ECP5-BGA256" H 1520 -257 50  0000 R CNN
-F 2 "luna:lattice_cabga256" H -1650 5350 50  0001 L CNN
+F 2 "amalthea:lattice_cabga256" H -1650 5350 50  0001 L CNN
 F 3 "" H -2100 6300 50  0001 L CNN
 F 4 "FPGA - Field Programmable Gate Array ECP5; 12k LUTs; 1.1V" H -2100 6200 50  0001 L CNN "Description"
 F 5 "1.7" H -2100 6550 50  0001 L CNN "Height"
