@@ -213,88 +213,12 @@ Wire Wire Line
 Connection ~ 1300 3700
 Wire Wire Line
 	1300 3700 1200 3700
-Wire Wire Line
-	9000 2900 9050 2900
-Connection ~ 9000 2900
-Wire Wire Line
-	9000 3000 9000 2900
-$Comp
-L power:GND #PWR08
-U 1 1 5DD6FDBE
-P 9000 3000
-F 0 "#PWR08" H 9000 2750 50  0001 C CNN
-F 1 "GND" H 9004 2828 50  0000 C CNN
-F 2 "" H 9000 3000 50  0001 C CNN
-F 3 "" H 9000 3000 50  0001 C CNN
-	1    9000 3000
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	9050 2900 9050 2850
-Wire Wire Line
-	8950 2900 9000 2900
-Wire Wire Line
-	8950 2850 8950 2900
-$Comp
-L Connector:USB_A J3
-U 1 1 5DD6DEF2
-P 8950 2450
-F 0 "J3" H 8721 2439 50  0000 R CNN
-F 1 "USB_A" H 8721 2349 50  0000 R CNN
-F 2 "amalthea:CONN-Amphenol-UE27AC54100" H 9100 2400 50  0001 C CNN
-F 3 " ~" H 9100 2400 50  0001 C CNN
-	1    8950 2450
-	-1   0    0    -1  
-$EndComp
-Wire Wire Line
-	4000 3500 3600 3500
 $Sheet
 S 4000 3350 1700 1250
 U 5DDDB747
 F0 "Target Section" 50
 F1 "target_side.sch" 50
-F2 "TARGET_ID" B R 5700 3950 50 
-F3 "TARGET_D+" B R 5700 3750 50 
-F4 "TARGET_D-" B R 5700 3850 50 
-F5 "TARGET_VBUS" I R 5700 3550 50 
-F6 "TARGET_PHY_1V8" O L 4000 3500 50 
-F7 "TARGET_FAULT" I R 5700 4150 50 
-F8 "A_PORT_POWER_ENABLE" O R 5700 4350 50 
-F9 "ALLOW_POWER_VIA_TARGET_PORT" O R 5700 4450 50 
 $EndSheet
-Wire Wire Line
-	9050 4200 9000 4200
-Connection ~ 9050 4200
-Wire Wire Line
-	9050 4250 9050 4200
-$Comp
-L power:GND #PWR09
-U 1 1 5DD6B00F
-P 9050 4250
-F 0 "#PWR09" H 9050 4000 50  0001 C CNN
-F 1 "GND" H 9054 4078 50  0000 C CNN
-F 2 "" H 9050 4250 50  0001 C CNN
-F 3 "" H 9050 4250 50  0001 C CNN
-	1    9050 4250
-	-1   0    0    -1  
-$EndComp
-Wire Wire Line
-	9000 4200 9000 4150
-Wire Wire Line
-	9100 4200 9050 4200
-Wire Wire Line
-	9100 4150 9100 4200
-$Comp
-L Connector:USB_B_Micro J4
-U 1 1 5DD6B002
-P 9000 3750
-F 0 "J4" H 9056 4215 50  0000 C CNN
-F 1 "USB_B_Micro" H 9056 4125 50  0000 C CNN
-F 2 "Connector_USB:USB_Micro-B_Amphenol_10103594-0001LF_Horizontal" H 9150 3700 50  0001 C CNN
-F 3 "~" H 9150 3700 50  0001 C CNN
-	1    9000 3750
-	-1   0    0    -1  
-$EndComp
 Wire Wire Line
 	8550 1600 8700 1600
 Text Label 10000 1350 0    50   ~ 0
@@ -312,36 +236,11 @@ $EndSheet
 Text Notes 4250 2400 0    100  ~ 0
 64Mib HyperRAM
 Wire Wire Line
-	5700 3550 6200 3550
-Wire Wire Line
-	5700 3750 6300 3750
-Wire Wire Line
-	5700 3850 6400 3850
-Wire Wire Line
 	10700 2050 8450 2050
 Wire Wire Line
 	8450 2050 8450 2250
 Wire Wire Line
 	8450 2250 8650 2250
-Wire Wire Line
-	6200 1500 6200 3550
-Connection ~ 6200 3550
-Wire Wire Line
-	6200 3550 8700 3550
-Wire Wire Line
-	6300 2450 6300 3750
-Wire Wire Line
-	6300 2450 8650 2450
-Connection ~ 6300 3750
-Wire Wire Line
-	6300 3750 8700 3750
-Wire Wire Line
-	6400 3850 6400 2550
-Wire Wire Line
-	6400 2550 8650 2550
-Connection ~ 6400 3850
-Wire Wire Line
-	6400 3850 8700 3850
 $Comp
 L Device:R R2
 U 1 1 5DFA3A73
@@ -357,10 +256,6 @@ Wire Wire Line
 	3200 6900 3200 6000
 Wire Wire Line
 	3500 5300 4000 5300
-Wire Wire Line
-	4000 5200 3600 5200
-Wire Wire Line
-	3600 5200 3600 3500
 Text Label 5850 6750 0    50   ~ 0
 SIDEBAND_D+
 Text Label 5850 6850 0    50   ~ 0
@@ -409,22 +304,6 @@ F 3 "" H 1300 2200 50  0001 C CNN
 $EndComp
 Wire Wire Line
 	1700 2600 2150 2600
-Text Label 5950 4450 0    50   ~ 0
-VBUS_PASSTHROUGH_EN
-Text Label 5950 4350 0    50   ~ 0
-PROVIDE_A_PORT_VBUS
-Text Label 7200 2450 0    50   ~ 0
-TARGET_D+
-Text Label 7200 2550 0    50   ~ 0
-TARGET_D-
-Text Label 7200 3750 0    50   ~ 0
-TARGET_D+
-Text Label 7200 3850 0    50   ~ 0
-TARGET_D-
-Text Label 7200 3950 0    50   ~ 0
-TARGET_ID
-Text Label 7200 3550 0    50   ~ 0
-TARGET_VBUS_IN
 Text Label 8750 2050 0    50   ~ 0
 TARGET_VBUS_OUT
 Text Label 1300 3900 0    50   ~ 0
@@ -502,8 +381,6 @@ Text Label 3950 6900 2    50   ~ 0
 SIDEBAND_PHY_1V8
 Text Label 3000 4800 0    50   ~ 0
 HOST_PHY_1V8
-Text Label 3600 4150 1    50   ~ 0
-TARGET_PHY_1V8
 $Comp
 L Switch:SW_SPST SW3
 U 1 1 5E2B35A7
@@ -557,8 +434,6 @@ $EndComp
 Wire Wire Line
 	1300 3050 1300 2950
 Wire Wire Line
-	8700 3950 5700 3950
-Wire Wire Line
 	5700 6200 5850 6200
 Wire Wire Line
 	5700 6300 5850 6300
@@ -577,10 +452,6 @@ F 3 "" H 1650 3550 50  0001 C CNN
 	1    1650 3550
 	0    1    1    0   
 $EndComp
-Wire Wire Line
-	5700 4150 5800 4150
-Text Label 5950 4150 0    50   ~ 0
-TARGET_FAULT
 Text Label 9050 6100 0    50   ~ 0
 DEBUG_SPI_MOSI
 $Comp
@@ -958,10 +829,6 @@ Wire Notes Line
 	3900 500  3900 3200
 Wire Notes Line
 	3900 3200 500  3200
-Wire Wire Line
-	5950 4350 5700 4350
-Wire Wire Line
-	5950 4450 5700 4450
 $Comp
 L support_hardware:AP22804-SOT U12
 U 1 1 5DDCF875
@@ -1082,37 +949,6 @@ Wire Wire Line
 Connection ~ 9650 1350
 Wire Wire Line
 	9650 1350 10000 1350
-$Comp
-L Device:R R3
-U 1 1 5DEBAF7B
-P 6800 4050
-F 0 "R3" V 6900 4050 50  0000 C CNN
-F 1 "10K" V 6800 4050 50  0000 C CNN
-F 2 "Capacitor_SMD:C_0402_1005Metric" V 6730 4050 50  0001 C CNN
-F 3 "~" H 6800 4050 50  0001 C CNN
-	1    6800 4050
-	0    1    1    0   
-$EndComp
-Wire Wire Line
-	5800 4150 5800 4050
-Wire Wire Line
-	5800 4050 6650 4050
-Connection ~ 5800 4150
-Wire Wire Line
-	5800 4150 5950 4150
-$Comp
-L power:+3V3 #PWR0117
-U 1 1 5DEC924F
-P 7000 4050
-F 0 "#PWR0117" H 7000 3900 50  0001 C CNN
-F 1 "+3V3" V 7014 4178 50  0000 L CNN
-F 2 "" H 7000 4050 50  0001 C CNN
-F 3 "" H 7000 4050 50  0001 C CNN
-	1    7000 4050
-	0    1    1    0   
-$EndComp
-Wire Wire Line
-	7000 4050 6950 4050
 $Comp
 L Device:C C53
 U 1 1 5DED4B80
