@@ -30,21 +30,6 @@ F 9 "https://www.mouser.com/Search/Refine.aspx?Keyword=842-LFE5U12F6BG256C" H -1
 	4    1650 2100
 	1    0    0    -1  
 $EndComp
-NoConn ~ 2600 3550
-NoConn ~ 2600 3150
-NoConn ~ 2600 3250
-NoConn ~ 2600 3650
-NoConn ~ 2600 3750
-NoConn ~ 2600 3850
-NoConn ~ 2600 4350
-NoConn ~ 2600 4450
-NoConn ~ 2600 4550
-NoConn ~ 2600 4650
-NoConn ~ 2600 4750
-NoConn ~ 2600 4850
-NoConn ~ 2600 5050
-NoConn ~ 2600 5150
-NoConn ~ 2600 5250
 Wire Wire Line
 	1800 1900 1800 1800
 Wire Wire Line
@@ -67,4 +52,189 @@ F 3 "" H 1850 1700 50  0001 C CNN
 	1    1850 1700
 	1    0    0    -1  
 $EndComp
+$Comp
+L rf:AT86RF215 U?
+U 1 1 5E8BDF16
+P 6400 3350
+F 0 "U?" H 6400 4765 50  0000 C CNN
+F 1 "AT86RF215" H 6400 4674 50  0000 C CNN
+F 2 "" H 6400 3100 50  0001 C CNN
+F 3 "" H 6400 3100 50  0001 C CNN
+	1    6400 3350
+	1    0    0    -1  
+$EndComp
+Entry Wire Line
+	4250 3200 4350 3100
+Entry Wire Line
+	4250 3000 4350 2900
+Entry Wire Line
+	4250 2900 4350 2800
+Wire Wire Line
+	4350 2900 5900 2900
+Wire Wire Line
+	4350 2800 5900 2800
+Wire Wire Line
+	5900 3000 4350 3000
+Wire Wire Line
+	5900 3100 4350 3100
+Entry Wire Line
+	4350 3000 4250 3100
+Wire Wire Line
+	5900 3300 4350 3300
+Wire Wire Line
+	5900 3500 4350 3500
+Wire Wire Line
+	5900 3600 4350 3600
+Wire Wire Line
+	5900 3700 4350 3700
+Wire Wire Line
+	5900 3800 4350 3800
+Wire Wire Line
+	5900 3900 4350 3900
+Wire Wire Line
+	5900 4000 4350 4000
+Wire Wire Line
+	5900 4200 4350 4200
+Wire Wire Line
+	5900 4300 4350 4300
+Wire Wire Line
+	5900 4400 4350 4400
+Wire Wire Line
+	5900 4500 4350 4500
+Entry Wire Line
+	4250 3400 4350 3300
+Entry Wire Line
+	4250 3600 4350 3500
+Entry Wire Line
+	4250 3700 4350 3600
+Entry Wire Line
+	4250 3800 4350 3700
+Entry Wire Line
+	4250 3900 4350 3800
+Entry Wire Line
+	4250 4000 4350 3900
+Entry Wire Line
+	4250 4100 4350 4000
+Entry Wire Line
+	4250 4300 4350 4200
+Entry Wire Line
+	4250 4400 4350 4300
+Entry Wire Line
+	4250 4500 4350 4400
+Entry Wire Line
+	4250 4600 4350 4500
+$Comp
+L power:GND #PWR?
+U 1 1 5E8DC56B
+P 7000 4600
+F 0 "#PWR?" H 7000 4350 50  0001 C CNN
+F 1 "GND" H 7005 4427 50  0000 C CNN
+F 2 "" H 7000 4600 50  0001 C CNN
+F 3 "" H 7000 4600 50  0001 C CNN
+	1    7000 4600
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6900 4500 7000 4500
+Wire Wire Line
+	7000 4500 7000 4600
+Wire Wire Line
+	6900 4400 7000 4400
+Wire Wire Line
+	7000 4400 7000 4500
+Connection ~ 7000 4500
+$Comp
+L Device:C C?
+U 1 1 5E8DD3C4
+P 7250 4450
+F 0 "C?" H 7365 4496 50  0000 L CNN
+F 1 "C" H 7365 4405 50  0000 L CNN
+F 2 "" H 7288 4300 50  0001 C CNN
+F 3 "~" H 7250 4450 50  0001 C CNN
+	1    7250 4450
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C C?
+U 1 1 5E8DDA59
+P 7600 4450
+F 0 "C?" H 7715 4496 50  0000 L CNN
+F 1 "C" H 7715 4405 50  0000 L CNN
+F 2 "" H 7638 4300 50  0001 C CNN
+F 3 "~" H 7600 4450 50  0001 C CNN
+	1    7600 4450
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR?
+U 1 1 5E8DDC6A
+P 7250 4600
+F 0 "#PWR?" H 7250 4350 50  0001 C CNN
+F 1 "GND" H 7255 4427 50  0000 C CNN
+F 2 "" H 7250 4600 50  0001 C CNN
+F 3 "" H 7250 4600 50  0001 C CNN
+	1    7250 4600
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR?
+U 1 1 5E8DDD8B
+P 7600 4600
+F 0 "#PWR?" H 7600 4350 50  0001 C CNN
+F 1 "GND" H 7605 4427 50  0000 C CNN
+F 2 "" H 7600 4600 50  0001 C CNN
+F 3 "" H 7600 4600 50  0001 C CNN
+	1    7600 4600
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6900 4200 7250 4200
+Wire Wire Line
+	7250 4200 7250 4300
+Wire Wire Line
+	6900 4100 7600 4100
+Wire Wire Line
+	7600 4100 7600 4300
+$Comp
+L power:+3.3V #PWR?
+U 1 1 5E8F94BD
+P 7000 2350
+F 0 "#PWR?" H 7000 2200 50  0001 C CNN
+F 1 "+3.3V" H 7015 2523 50  0000 C CNN
+F 2 "" H 7000 2350 50  0001 C CNN
+F 3 "" H 7000 2350 50  0001 C CNN
+	1    7000 2350
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6900 2400 7000 2400
+Wire Wire Line
+	7000 2400 7000 2350
+Wire Wire Line
+	6900 2500 7000 2500
+Wire Wire Line
+	7000 2500 7000 2400
+Connection ~ 7000 2400
+Text Notes 7100 2350 0    50   ~ 0
+TODO: Decoupling\n
+Text Label 5900 3500 2    50   ~ 0
+RXCLK_P
+Text Label 5900 3600 2    50   ~ 0
+RXCLK_N
+Text Notes 900  5550 0    50   ~ 0
+Clock inputs on:\n    PR23A/PR23B\n    PR23C/PR23D
+Text Label 2600 5350 0    50   ~ 0
+RXCLK_P
+Text Label 2600 5450 0    50   ~ 0
+RXCLK_N
+Wire Wire Line
+	2600 5350 4150 5350
+Wire Wire Line
+	2600 5450 4150 5450
+Wire Bus Line
+	4250 2350 4250 5750
+Entry Wire Line
+	4150 5350 4250 5450
+Entry Wire Line
+	4150 5450 4250 5550
 $EndSCHEMATC

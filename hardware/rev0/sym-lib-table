@@ -3,4 +3,5 @@
   (lib (name fpgas_and_processors)(type Legacy)(uri ${KIPRJMOD}/../libraries/fpgas_and_processors.lib)(options "")(descr ""))
   (lib (name usb)(type Legacy)(uri ${KIPRJMOD}/../libraries/usb.lib)(options "")(descr ""))
   (lib (name amalthea_rev0-rescue)(type Legacy)(uri ${KIPRJMOD}/amalthea_rev0-rescue.lib)(options "")(descr ""))
+  (lib (name rf)(type Legacy)(uri /home/mike/projects/amalthea/hardware/libraries/rf.lib)(options "")(descr ""))
 )
