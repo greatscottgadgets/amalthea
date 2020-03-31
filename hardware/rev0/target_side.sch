@@ -13,23 +13,6 @@ Comment2 ""
 Comment3 "Licensed under CERN-OHL-P version 2"
 Comment4 ""
 $EndDescr
-$Comp
-L fpgas_and_processors:ECP5-BGA256 IC1
-U 4 1 5DDE3D5A
-P 1650 2100
-F 0 "IC1" H 1620 283 50  0000 R CNN
-F 1 "ECP5-BGA256" H 1620 193 50  0000 R CNN
-F 2 "amalthea:lattice_cabga256" H -1550 5550 50  0001 L CNN
-F 3 "" H -2000 6500 50  0001 L CNN
-F 4 "FPGA - Field Programmable Gate Array ECP5; 12k LUTs; 1.1V" H -2000 6400 50  0001 L CNN "Description"
-F 5 "1.7" H -2000 6750 50  0001 L CNN "Height"
-F 6 "Lattice" H -1950 7350 50  0001 L CNN "Manufacturer_Name"
-F 7 "LFE5U-12F-6BG256C" H -1950 7250 50  0001 L CNN "Manufacturer_Part_Number"
-F 8 "842-LFE5U12F6BG256C" H -1300 5950 50  0001 L CNN "Mouser Part Number"
-F 9 "https://www.mouser.com/Search/Refine.aspx?Keyword=842-LFE5U12F6BG256C" H -1650 5800 50  0001 L CNN "Mouser Price/Stock"
-	4    1650 2100
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
 	1800 1900 1800 1800
 Wire Wire Line
@@ -53,12 +36,12 @@ F 3 "" H 1850 1700 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L rf:AT86RF215 U?
+L rf:AT86RF215 U9
 U 1 1 5E8BDF16
 P 6400 3350
-F 0 "U?" H 6400 4765 50  0000 C CNN
+F 0 "U9" H 6400 4765 50  0000 C CNN
 F 1 "AT86RF215" H 6400 4674 50  0000 C CNN
-F 2 "" H 6400 3100 50  0001 C CNN
+F 2 "Package_DFN_QFN:QFN-48-1EP_7x7mm_P0.5mm_EP5.6x5.6mm" H 6400 3100 50  0001 C CNN
 F 3 "" H 6400 3100 50  0001 C CNN
 	1    6400 3350
 	1    0    0    -1  
@@ -124,10 +107,10 @@ Entry Wire Line
 Entry Wire Line
 	4250 4600 4350 4500
 $Comp
-L power:GND #PWR?
+L power:GND #PWR0109
 U 1 1 5E8DC56B
 P 7000 4600
-F 0 "#PWR?" H 7000 4350 50  0001 C CNN
+F 0 "#PWR0109" H 7000 4350 50  0001 C CNN
 F 1 "GND" H 7005 4427 50  0000 C CNN
 F 2 "" H 7000 4600 50  0001 C CNN
 F 3 "" H 7000 4600 50  0001 C CNN
@@ -144,10 +127,10 @@ Wire Wire Line
 	7000 4400 7000 4500
 Connection ~ 7000 4500
 $Comp
-L Device:C C?
+L Device:C C40
 U 1 1 5E8DD3C4
 P 7250 4450
-F 0 "C?" H 7365 4496 50  0000 L CNN
+F 0 "C40" H 7365 4496 50  0000 L CNN
 F 1 "C" H 7365 4405 50  0000 L CNN
 F 2 "" H 7288 4300 50  0001 C CNN
 F 3 "~" H 7250 4450 50  0001 C CNN
@@ -155,10 +138,10 @@ F 3 "~" H 7250 4450 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Device:C C?
+L Device:C C41
 U 1 1 5E8DDA59
 P 7600 4450
-F 0 "C?" H 7715 4496 50  0000 L CNN
+F 0 "C41" H 7715 4496 50  0000 L CNN
 F 1 "C" H 7715 4405 50  0000 L CNN
 F 2 "" H 7638 4300 50  0001 C CNN
 F 3 "~" H 7600 4450 50  0001 C CNN
@@ -166,10 +149,10 @@ F 3 "~" H 7600 4450 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L power:GND #PWR?
+L power:GND #PWR0117
 U 1 1 5E8DDC6A
 P 7250 4600
-F 0 "#PWR?" H 7250 4350 50  0001 C CNN
+F 0 "#PWR0117" H 7250 4350 50  0001 C CNN
 F 1 "GND" H 7255 4427 50  0000 C CNN
 F 2 "" H 7250 4600 50  0001 C CNN
 F 3 "" H 7250 4600 50  0001 C CNN
@@ -177,10 +160,10 @@ F 3 "" H 7250 4600 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L power:GND #PWR?
+L power:GND #PWR0122
 U 1 1 5E8DDD8B
 P 7600 4600
-F 0 "#PWR?" H 7600 4350 50  0001 C CNN
+F 0 "#PWR0122" H 7600 4350 50  0001 C CNN
 F 1 "GND" H 7605 4427 50  0000 C CNN
 F 2 "" H 7600 4600 50  0001 C CNN
 F 3 "" H 7600 4600 50  0001 C CNN
@@ -196,10 +179,10 @@ Wire Wire Line
 Wire Wire Line
 	7600 4100 7600 4300
 $Comp
-L power:+3.3V #PWR?
+L power:+3.3V #PWR0123
 U 1 1 5E8F94BD
 P 7000 2350
-F 0 "#PWR?" H 7000 2200 50  0001 C CNN
+F 0 "#PWR0123" H 7000 2200 50  0001 C CNN
 F 1 "+3.3V" H 7015 2523 50  0000 C CNN
 F 2 "" H 7000 2350 50  0001 C CNN
 F 3 "" H 7000 2350 50  0001 C CNN
@@ -231,10 +214,59 @@ Wire Wire Line
 	2600 5350 4150 5350
 Wire Wire Line
 	2600 5450 4150 5450
-Wire Bus Line
-	4250 2350 4250 5750
 Entry Wire Line
 	4150 5350 4250 5450
 Entry Wire Line
 	4150 5450 4250 5550
+Text Label 5900 3700 2    50   ~ 0
+RXD09_P
+Text Label 5900 3800 2    50   ~ 0
+RXD09_N
+Text Label 5900 3900 2    50   ~ 0
+RXD24_P
+Text Label 5900 4000 2    50   ~ 0
+RXD24_N
+Text Label 5900 4200 2    50   ~ 0
+TXCLK_P
+Text Label 5900 4300 2    50   ~ 0
+TXCLK_N
+Text Label 5900 4400 2    50   ~ 0
+TXD_P
+Text Label 5900 4500 2    50   ~ 0
+TXD_N
+Text Label 2600 3350 0    50   ~ 0
+RXD09_P
+Text Label 2600 3450 0    50   ~ 0
+RXD09_N
+Text Label 2600 5550 0    50   ~ 0
+RXD24_P
+Text Label 2600 5650 0    50   ~ 0
+RXD24_N
+Text Label 2600 2550 0    50   ~ 0
+TXCLK_P
+Text Label 2600 2650 0    50   ~ 0
+TXCLK_N
+Text Label 2600 2950 0    50   ~ 0
+TXD_P
+Text Label 2600 3050 0    50   ~ 0
+TXD_N
+$Comp
+L fpgas_and_processors:ECP5-BGA256 IC1
+U 4 1 5DDE3D5A
+P 1650 2100
+F 0 "IC1" H 1620 283 50  0000 R CNN
+F 1 "ECP5-BGA256" H 1620 193 50  0000 R CNN
+F 2 "amalthea:lattice_cabga256" H -1550 5550 50  0001 L CNN
+F 3 "" H -2000 6500 50  0001 L CNN
+F 4 "FPGA - Field Programmable Gate Array ECP5; 12k LUTs; 1.1V" H -2000 6400 50  0001 L CNN "Description"
+F 5 "1.7" H -2000 6750 50  0001 L CNN "Height"
+F 6 "Lattice" H -1950 7350 50  0001 L CNN "Manufacturer_Name"
+F 7 "LFE5U-12F-6BG256C" H -1950 7250 50  0001 L CNN "Manufacturer_Part_Number"
+F 8 "842-LFE5U12F6BG256C" H -1300 5950 50  0001 L CNN "Mouser Part Number"
+F 9 "https://www.mouser.com/Search/Refine.aspx?Keyword=842-LFE5U12F6BG256C" H -1650 5800 50  0001 L CNN "Mouser Price/Stock"
+	4    1650 2100
+	1    0    0    -1  
+$EndComp
+Wire Bus Line
+	4250 2350 4250 5750
 $EndSCHEMATC
