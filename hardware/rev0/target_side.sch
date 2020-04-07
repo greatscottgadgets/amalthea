@@ -39,8 +39,8 @@ $Comp
 L rf:AT86RF215 U9
 U 1 1 5E8BDF16
 P 5150 3900
-F 0 "U9" H 5150 5315 50  0000 C CNN
-F 1 "AT86RF215" H 5150 5224 50  0000 C CNN
+F 0 "U9" H 5150 5350 50  0000 C CNN
+F 1 "AT86RF215" H 5150 5250 50  0000 C CNN
 F 2 "Package_DFN_QFN:QFN-48-1EP_7x7mm_P0.5mm_EP5.6x5.6mm" H 5150 3650 50  0001 C CNN
 F 3 "" H 5150 3650 50  0001 C CNN
 	1    5150 3900
@@ -340,8 +340,6 @@ Wire Wire Line
 	6700 3950 6700 4400
 Wire Wire Line
 	6700 4400 8000 4400
-Text HLabel 10400 4300 2    50   Input ~ 0
-RF09
 $Comp
 L Device:C C42
 U 1 1 5E965FC4
@@ -462,8 +460,6 @@ F 3 "~" H 10200 3200 50  0001 C CNN
 	1    10200 3200
 	-1   0    0    1   
 $EndComp
-Text HLabel 10400 2950 2    50   Input ~ 0
-RF24
 Wire Wire Line
 	9100 2950 9200 2950
 Wire Wire Line
@@ -946,8 +942,30 @@ Wire Wire Line
 Connection ~ 5700 6500
 Wire Wire Line
 	5700 6500 6200 6500
-Wire Bus Line
-	3400 2900 3400 6300
 Text Notes 4100 6350 0    50   ~ 0
 DEVDD/EDD decoupling
+Text Label 4650 3350 2    50   ~ 0
+SCLK
+Text Label 4650 3450 2    50   ~ 0
+~SELN
+Text Label 4650 3550 2    50   ~ 0
+MOSI
+Text Label 4650 3650 2    50   ~ 0
+MISO
+Wire Bus Line
+	3400 2900 3400 6300
+Text Notes 8550 2500 0    50   ~ 0
+TODO: swap 24/09 position to match physical layout
+Text Label 2400 5800 0    50   ~ 0
+SCLK
+Text Label 2400 4600 0    50   ~ 0
+~SELN
+Text Label 2400 4700 0    50   ~ 0
+MOSI
+Text Label 2400 5500 0    50   ~ 0
+MISO
+Text HLabel 10400 2950 2    50   Input ~ 0
+RF24
+Text HLabel 10400 4300 2    50   Input ~ 0
+RF09
 $EndSCHEMATC
