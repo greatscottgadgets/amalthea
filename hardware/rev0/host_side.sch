@@ -359,8 +359,6 @@ $EndComp
 Wire Wire Line
 	5150 3350 5250 3350
 Connection ~ 5250 3350
-NoConn ~ 2700 2200
-NoConn ~ 2700 2500
 NoConn ~ 2700 2600
 NoConn ~ 2700 2700
 NoConn ~ 2700 3000
@@ -510,12 +508,12 @@ HOST_DATA5
 Text Label 2850 2400 0    50   ~ 0
 HOST_DATA6
 Wire Wire Line
-	2700 1900 4350 1900
+	2700 2500 4350 2500
 Entry Wire Line
-	4350 1900 4450 2000
+	4350 2500 4450 2600
 Entry Wire Line
 	4350 3650 4450 3750
-Text Label 2850 1900 0    50   ~ 0
+Text Label 2850 2500 0    50   ~ 0
 HOST_DATA7
 $Comp
 L fpgas_and_processors:ECP5-BGA256 IC1
@@ -548,4 +546,12 @@ Wire Wire Line
 	6800 3500 7200 3500
 Wire Bus Line
 	4450 1650 4450 5800
+Text HLabel 2700 1900 2    50   Input ~ 0
+USER_IO0_P
+Text HLabel 2700 2000 2    50   Input ~ 0
+USER_IO0_N
+Text HLabel 2700 2200 2    50   Input ~ 0
+USER_IO1_N
+Text HLabel 2700 2100 2    50   Input ~ 0
+USER_IO1_P
 $EndSCHEMATC
