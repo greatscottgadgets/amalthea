@@ -632,23 +632,23 @@ Wire Wire Line
 $Comp
 L Connector:Conn_Coaxial J8
 U 1 1 5E41D377
-P 3700 3700
-F 0 "J8" H 3800 3674 50  0000 L CNN
-F 1 "Conn_Coaxial" H 3800 3584 50  0001 L CNN
-F 2 "amalthea:SMA-EDGE" H 3700 3700 50  0001 C CNN
-F 3 " ~" H 3700 3700 50  0001 C CNN
-	1    3700 3700
+P 3700 4100
+F 0 "J8" H 3800 4074 50  0000 L CNN
+F 1 "Conn_Coaxial" H 3800 3984 50  0001 L CNN
+F 2 "amalthea:SMA-EDGE" H 3700 4100 50  0001 C CNN
+F 3 " ~" H 3700 4100 50  0001 C CNN
+	1    3700 4100
 	1    0    0    -1  
 $EndComp
 $Comp
 L Connector:Conn_Coaxial J9
 U 1 1 5E41DB94
-P 3700 4100
-F 0 "J9" H 3799 4029 50  0000 L CNN
-F 1 "Conn_Coaxial" H 3800 3984 50  0001 L CNN
-F 2 "amalthea:SMA-EDGE" H 3700 4100 50  0001 C CNN
-F 3 " ~" H 3700 4100 50  0001 C CNN
-	1    3700 4100
+P 3700 3700
+F 0 "J9" H 3799 3629 50  0000 L CNN
+F 1 "Conn_Coaxial" H 3800 3584 50  0001 L CNN
+F 2 "amalthea:SMA-EDGE" H 3700 3700 50  0001 C CNN
+F 3 " ~" H 3700 3700 50  0001 C CNN
+	1    3700 3700
 	1    0    0    -1  
 $EndComp
 Wire Wire Line

@@ -72,29 +72,9 @@ F 3 "" H 2450 1500 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	3150 2400 3750 2400
-Wire Wire Line
-	3150 2600 3750 2600
-Wire Wire Line
-	3150 2700 3750 2700
-Wire Wire Line
-	3150 3650 3750 3650
-Wire Wire Line
-	3150 3750 3750 3750
-Text HLabel 3750 3650 2    50   BiDi ~ 0
-USER_IO0
-Text HLabel 3750 2700 2    50   BiDi ~ 0
-USER_IO1
-Text HLabel 3750 2600 2    50   BiDi ~ 0
-USER_IO2
-Text HLabel 3750 2400 2    50   BiDi ~ 0
-USER_IO3
-Text HLabel 3750 3750 2    50   BiDi ~ 0
-USER_IO4
-Wire Wire Line
-	3150 4750 3700 4750
-Text HLabel 3700 4750 2    50   BiDi ~ 0
-USER_IO5
-Wire Wire Line
 	3150 4650 3700 4650
+NoConn ~ 3150 2400
+NoConn ~ 3150 3650
+NoConn ~ 3150 3750
+NoConn ~ 3150 4750
 $EndSCHEMATC
