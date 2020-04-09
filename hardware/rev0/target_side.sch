@@ -968,4 +968,12 @@ Text HLabel 10400 2950 2    50   Input ~ 0
 RF24
 Text HLabel 10400 4300 2    50   Input ~ 0
 RF09
+Text Label 5650 3550 0    50   ~ 0
+RF24_P
+Text Label 5650 3650 0    50   ~ 0
+RF24_N
+Text Label 5650 3850 0    50   ~ 0
+RF09_P
+Text Label 5650 3950 0    50   ~ 0
+RF09_N
 $EndSCHEMATC
