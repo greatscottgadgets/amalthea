@@ -412,8 +412,6 @@ $EndComp
 Connection ~ 4800 3850
 Wire Wire Line
 	4800 3850 4800 4050
-Wire Wire Line
-	5750 4050 5900 4050
 $Comp
 L Device:C C29
 U 1 1 5DB5AC8D
@@ -425,9 +423,6 @@ F 3 "~" H 5900 4200 50  0001 C CNN
 	1    5900 4200
 	1    0    0    -1  
 $EndComp
-Connection ~ 5900 4050
-Wire Wire Line
-	5900 4050 6050 4050
 Wire Wire Line
 	5900 4350 5900 4500
 Wire Wire Line
@@ -1019,4 +1014,9 @@ Wire Wire Line
 	2700 2150 2900 2150
 Connection ~ 2700 2150
 Connection ~ 2900 2150
+Wire Wire Line
+	5750 4050 5900 4050
+Connection ~ 5900 4050
+Wire Wire Line
+	5900 4050 6050 4050
 $EndSCHEMATC
