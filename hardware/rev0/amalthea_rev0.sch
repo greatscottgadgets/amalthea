@@ -627,12 +627,12 @@ Wire Wire Line
 $Comp
 L Connector:Conn_Coaxial J8
 U 1 1 5E41D377
-P 3700 4100
-F 0 "J8" H 3800 4074 50  0000 L CNN
-F 1 "Conn_Coaxial" H 3800 3984 50  0001 L CNN
-F 2 "amalthea:SMA-EDGE" H 3700 4100 50  0001 C CNN
-F 3 " ~" H 3700 4100 50  0001 C CNN
-	1    3700 4100
+P 3700 4200
+F 0 "J8" H 3800 4174 50  0000 L CNN
+F 1 "Conn_Coaxial" H 3800 4084 50  0001 L CNN
+F 2 "amalthea:SMA-EDGE" H 3700 4200 50  0001 C CNN
+F 3 " ~" H 3700 4200 50  0001 C CNN
+	1    3700 4200
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -792,21 +792,7 @@ F 3 "" H 7100 3850 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	2950 3700 3500 3700
-Wire Wire Line
-	2950 3800 3500 3800
-Wire Wire Line
-	3500 3800 3500 3900
-Wire Wire Line
-	3500 3900 3700 3900
-Wire Wire Line
-	2950 4100 3500 4100
-Wire Wire Line
 	2950 4200 3500 4200
-Wire Wire Line
-	3500 4200 3500 4300
-Wire Wire Line
-	3500 4300 3700 4300
 $Comp
 L power:PWR_FLAG #FLG0101
 U 1 1 5EE01800
@@ -825,4 +811,64 @@ Wire Wire Line
 Connection ~ 1550 3550
 Wire Wire Line
 	1550 3550 1700 3550
+$Comp
+L power:GND #PWR0142
+U 1 1 5EEEE881
+P 3700 4400
+F 0 "#PWR0142" H 3700 4150 50  0001 C CNN
+F 1 "GND" H 3705 4227 50  0000 C CNN
+F 2 "" H 3700 4400 50  0001 C CNN
+F 3 "" H 3700 4400 50  0001 C CNN
+	1    3700 4400
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0143
+U 1 1 5EEF3D86
+P 3700 3900
+F 0 "#PWR0143" H 3700 3650 50  0001 C CNN
+F 1 "GND" H 3705 3727 50  0000 C CNN
+F 2 "" H 3700 3900 50  0001 C CNN
+F 3 "" H 3700 3900 50  0001 C CNN
+	1    3700 3900
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2950 4100 3500 4100
+Wire Wire Line
+	3500 4100 3500 3700
+$Comp
+L Connector:TestPoint TP2
+U 1 1 5EEFB3F1
+P 3050 3450
+F 0 "TP2" H 3108 3568 50  0000 L CNN
+F 1 "TestPoint" H 3108 3478 50  0000 L CNN
+F 2 "TestPoint:TestPoint_Pad_D1.0mm" H 3250 3450 50  0001 C CNN
+F 3 "~" H 3250 3450 50  0001 C CNN
+	1    3050 3450
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector:TestPoint TP6
+U 1 1 5EEFBF5B
+P 3550 3450
+F 0 "TP6" H 3608 3568 50  0000 L CNN
+F 1 "TestPoint" H 3608 3478 50  0000 L CNN
+F 2 "TestPoint:TestPoint_Pad_D1.0mm" H 3750 3450 50  0001 C CNN
+F 3 "~" H 3750 3450 50  0001 C CNN
+	1    3550 3450
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3050 3450 3050 3700
+Wire Wire Line
+	3050 3700 2950 3700
+Wire Wire Line
+	2950 3800 3300 3800
+Wire Wire Line
+	3300 3800 3300 3550
+Wire Wire Line
+	3300 3550 3550 3550
+Wire Wire Line
+	3550 3550 3550 3450
 $EndSCHEMATC
