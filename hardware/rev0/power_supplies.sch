@@ -439,17 +439,6 @@ Wire Notes Line
 Wire Notes Line
 	550  3350 7000 3350
 $Comp
-L support_hardware:TCR2EF11 U4
-U 1 1 5DB6F5E4
-P 5350 4150
-F 0 "U4" H 5350 4517 50  0000 C CNN
-F 1 "TCR2EF11" H 5350 4426 50  0000 C CNN
-F 2 "Package_TO_SOT_SMD:SOT-553" H 5350 3750 50  0001 C CNN
-F 3 "https://toshiba.semicon-storage.com/info/docget.jsp?did=13794&prodName=TCR2EF45" H 5100 4400 50  0001 C CNN
-	1    5350 4150
-	1    0    0    -1  
-$EndComp
-$Comp
 L power:+2V5 #PWR030
 U 1 1 5DB70700
 P 4800 3750
@@ -1019,4 +1008,15 @@ Wire Wire Line
 Connection ~ 5900 4050
 Wire Wire Line
 	5900 4050 6050 4050
+$Comp
+L support_hardware:TCR2EE11 U4
+U 1 1 5ED4FF7D
+P 5350 4150
+F 0 "U4" H 5350 4517 50  0000 C CNN
+F 1 "TCR2EE11" H 5350 4426 50  0000 C CNN
+F 2 "Package_TO_SOT_SMD:SOT-553" H 5350 3750 50  0001 C CNN
+F 3 "https://toshiba.semicon-storage.com/info/docget.jsp?did=13794&prodName=TCR2EF45" H 5100 4400 50  0001 C CNN
+	1    5350 4150
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC
