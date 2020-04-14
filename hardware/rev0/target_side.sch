@@ -781,10 +781,6 @@ F 3 "" H 3950 3050 50  0001 C CNN
 $EndComp
 Wire Wire Line
 	4250 3050 4650 3050
-Entry Wire Line
-	3400 3250 3500 3150
-Wire Wire Line
-	4650 3150 3500 3150
 $Comp
 L Device:C C59
 U 1 1 5EAB33F2
@@ -952,8 +948,6 @@ Text Label 4650 3550 2    50   ~ 0
 MOSI
 Text Label 4650 3650 2    50   ~ 0
 MISO
-Wire Bus Line
-	3400 2900 3400 6300
 Text Notes 8550 2500 0    50   ~ 0
 TODO: swap 24/09 position to match physical layout
 Text Label 2400 5800 0    50   ~ 0
@@ -976,4 +970,85 @@ Text Label 5650 3850 0    50   ~ 0
 RF09_P
 Text Label 5650 3950 0    50   ~ 0
 RF09_N
+NoConn ~ 4650 3150
+Wire Wire Line
+	4550 2750 4650 2750
+Text Label 4650 3850 2    50   ~ 0
+IRQ
+Text Label 2400 4500 0    50   ~ 0
+IRQ
+Text Label 4550 2750 2    50   ~ 0
+~RSTN
+Text Label 2400 3300 0    50   ~ 0
+~RSTN
+NoConn ~ 5650 3250
+NoConn ~ 5650 3350
+NoConn ~ 5650 4100
+NoConn ~ 5650 4200
+NoConn ~ 2400 5600
+NoConn ~ 2400 5700
+NoConn ~ 2400 5300
+NoConn ~ 2400 5400
+NoConn ~ 2400 5200
+NoConn ~ 2400 5100
+NoConn ~ 2400 5000
+NoConn ~ 2400 4900
+NoConn ~ 2400 4800
+NoConn ~ 2400 4300
+NoConn ~ 2400 4200
+NoConn ~ 2400 4100
+NoConn ~ 2400 3800
+NoConn ~ 2400 3700
+NoConn ~ 2400 3400
+NoConn ~ 2400 4400
+Entry Wire Line
+	3300 5800 3400 5900
+Entry Wire Line
+	3300 5500 3400 5600
+Entry Wire Line
+	3300 4700 3400 4800
+Entry Wire Line
+	3300 4600 3400 4700
+Entry Wire Line
+	3300 4500 3400 4600
+Entry Wire Line
+	3300 4000 3400 4100
+Entry Wire Line
+	3300 3900 3400 4000
+Entry Wire Line
+	3300 3600 3400 3700
+Entry Wire Line
+	3300 3500 3400 3600
+Entry Wire Line
+	3300 3300 3400 3400
+Entry Wire Line
+	3300 3200 3400 3300
+Entry Wire Line
+	3300 3100 3400 3200
+Wire Wire Line
+	2400 3100 3300 3100
+Wire Wire Line
+	3300 3200 2400 3200
+Wire Wire Line
+	2400 3300 3300 3300
+Wire Wire Line
+	3300 3500 2400 3500
+Wire Wire Line
+	2400 3600 3300 3600
+Wire Wire Line
+	2400 3900 3300 3900
+Wire Wire Line
+	3300 4000 2400 4000
+Wire Wire Line
+	2400 4500 3300 4500
+Wire Wire Line
+	3300 4600 2400 4600
+Wire Wire Line
+	2400 4700 3300 4700
+Wire Wire Line
+	3300 5500 2400 5500
+Wire Wire Line
+	2400 5800 3300 5800
+Wire Bus Line
+	3400 2900 3400 6300
 $EndSCHEMATC

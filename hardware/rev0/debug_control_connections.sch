@@ -77,4 +77,6 @@ NoConn ~ 3150 2400
 NoConn ~ 3150 3650
 NoConn ~ 3150 3750
 NoConn ~ 3150 4750
+NoConn ~ 3150 2600
+NoConn ~ 3150 2700
 $EndSCHEMATC

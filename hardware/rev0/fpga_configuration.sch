@@ -703,8 +703,6 @@ F 3 "" H 3700 2350 50  0001 C CNN
 $EndComp
 Wire Wire Line
 	3550 2750 4650 2750
-Wire Wire Line
-	3550 2850 4650 2850
 NoConn ~ 3550 4750
 NoConn ~ 3550 4850
 NoConn ~ 1550 2150
@@ -713,8 +711,6 @@ Text HLabel 4650 2450 2    50   Input ~ 0
 SIDEBAND_PHY_1V8
 Text HLabel 4650 2750 2    50   Input ~ 0
 HOST_PHY_1V8
-Text HLabel 4650 2850 2    50   Input ~ 0
-TARGET_PHY_1V8
 NoConn ~ 9450 2900
 NoConn ~ 9450 3000
 NoConn ~ 9450 3500
@@ -936,4 +932,5 @@ Wire Wire Line
 Text HLabel 4150 3650 2    50   Output ~ 0
 DEBUG_SPI_CS
 NoConn ~ 1550 2350
+NoConn ~ 3550 2850
 $EndSCHEMATC
