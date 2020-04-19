@@ -1046,7 +1046,7 @@ F 0 "U4" H 5350 4517 50  0000 C CNN
 F 1 "TCR2EE11" H 5350 4426 50  0000 C CNN
 F 2 "Package_TO_SOT_SMD:SOT-553" H 5350 3750 50  0001 C CNN
 F 3 "https://toshiba.semicon-storage.com/info/docget.jsp?did=13794&prodName=TCR2EF45" H 5100 4400 50  0001 C CNN
-F 4 "TCR2EE11,LM" H 5350 4150 50  0001 C CNN "Manufacturer_Part_Number"
+F 4 "TCR2EE11,LM(CT" H 5350 4150 50  0001 C CNN "Manufacturer_Part_Number"
 	1    5350 4150
 	1    0    0    -1  
 $EndComp
