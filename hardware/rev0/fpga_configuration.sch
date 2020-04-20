@@ -448,7 +448,7 @@ F 0 "J6" H 5600 7350 50  0000 R CNN
 F 1 "Conn_ARM_JTAG_SWD_10" H 5600 7250 50  0000 R CNN
 F 2 "amalthea:SWD_CONNECTOR_LARGE_BOX" H 5850 6650 50  0001 C CNN
 F 3 "http://infocenter.arm.com/help/topic/com.arm.doc.ddi0314h/DDI0314H_coresight_components_trm.pdf" V 5500 5400 50  0001 C CNN
-F 4 "SHF-105-01-L-D-TH" H 5850 6650 50  0001 C CNN "Manufacturer_Part_Number"
+F 4 "FTSH-105-01-F-D-K" H 5850 6650 50  0001 C CNN "Manufacturer_Part_Number"
 	1    5850 6650
 	-1   0    0    -1  
 $EndComp
@@ -742,7 +742,7 @@ F 0 "J5" H 1450 7250 50  0000 R CNN
 F 1 "Conn_ARM_JTAG_SWD_10" V 1200 7050 50  0000 R CNN
 F 2 "amalthea:SWD_CONNECTOR_LARGE_BOX" H 1750 6650 50  0001 C CNN
 F 3 "http://infocenter.arm.com/help/topic/com.arm.doc.ddi0314h/DDI0314H_coresight_components_trm.pdf" V 1400 5400 50  0001 C CNN
-F 4 "SHF-105-01-L-D-TH" H 1750 6650 50  0001 C CNN "Manufacturer_Part_Number"
+F 4 "FTSH-105-01-F-D-K" H 1750 6650 50  0001 C CNN "Manufacturer_Part_Number"
 	1    1750 6650
 	-1   0    0    -1  
 $EndComp
