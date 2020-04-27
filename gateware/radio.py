@@ -70,14 +70,19 @@ class RadioSPI(Elaboratable):
         self.mosi = Signal()
         self.miso = Signal()
 
+        self._delay_counter = Signal(range(max(map(attrgetter("delay"), DELAY_STATES.values()))+1))
+
+
+    def enter_delay_state(self, m, state):
+        m.d.sync += self._delay_counter.eq(DELAY_STATES[state].delay)
+        m.next = state
+
     def elaborate(self, platform):
         m = Module()
 
         SPI_FREQ = 20e6
         CLKS_PER_HALFBIT = int(SYNC_FREQ // (SPI_FREQ * 2))
         sclk_counter = Signal(range(CLKS_PER_HALFBIT))
-
-        delay_counter = Signal(range(max(map(attrgetter("delay"), DELAY_STATES.values()))))
 
         # Shift register for 4.2.3 "Single Access Mode" transaction.
         # (first bit is shifted immediately on start pulse, so -1 here)
@@ -97,9 +102,8 @@ class RadioSPI(Elaboratable):
                         self.mosi.eq(self.write),
                         bits_remaining.eq(8),
                         bytes_remaining.eq(2),
-                        delay_counter.eq(DELAY_STATES["SEL_TO_SCLK"].delay)
                     ]
-                    m.next = "SEL_TO_SCLK"
+                    self.enter_delay_state(m, "SEL_TO_SCLK")
 
             with m.State("SHIFT"):
                 m.d.sync += sclk_counter.eq(sclk_counter - 1)
@@ -120,29 +124,26 @@ class RadioSPI(Elaboratable):
                 with m.If(bits_remaining == 0):
                     with m.If(bytes_remaining == 0):
                         # Transaction finished: delay before deasserting chip select.
-                        m.d.sync += delay_counter.eq(DELAY_STATES["SCLK_TO_SEL"].delay)
-                        m.next = "SCLK_TO_SEL"
+                        self.enter_delay_state(m, "SCLK_TO_SEL")
 
                     with m.Else():
                         # Byte finished: reset and delay before transmitting next byte.
                         m.d.sync += bytes_remaining.eq(bytes_remaining - 1)
                         m.d.sync += bits_remaining.eq(8)
-                        m.d.sync += delay_counter.eq(DELAY_STATES["BYTE_TO_BYTE"].delay)
-                        m.next = "BYTE_TO_BYTE"
+                        self.enter_delay_state(m, "BYTE_TO_BYTE")
 
             with m.State("END"):
                 # Deassert chip select and delay before next transaction can start.
                 m.d.sync += self.sel.eq(0)
-                m.d.sync += delay_counter.eq(DELAY_STATES["IDLE_TIME"].delay)
-                m.next = "IDLE_TIME"
+                self.enter_delay_state(m, "IDLE_TIME")
 
 
             for state in DELAY_STATES:
                 with m.State(state):
-                    with m.If(delay_counter == 0):
+                    with m.If(self._delay_counter == 0):
                         m.next = DELAY_STATES[state].next_state
                     with m.Else():
-                        m.d.sync += delay_counter.eq(delay_counter - 1)
+                        m.d.sync += self._delay_counter.eq(self._delay_counter - 1)
 
 
         return m
