@@ -1,15 +1,15 @@
 #
-# This file is part of LUNA.
+# This file is part of Amalthea.
 #
 
 import os
 
 from nmigen.build import Resource, Subsignal, Pins, PinsN, Attrs, Clock, DiffPairs, Connector
 from nmigen.vendor.lattice_ecp5 import LatticeECP5Platform
+from luna.gateware.architecture.car import LunaECP5DomainGenerator
 
-from ..architecture.car import LunaECP5DomainGenerator
 
-__all__ = ["LUNAPlatformR02"]
+__all__ = ["AmaltheaPlatformRev0D1"]
 
 #
 # Note that r0.2+ have D+/D- swapped to avoid having to cross D+/D- in routing.
@@ -31,10 +31,10 @@ def ULPIResource(name, data_sites, clk_site, dir_site, nxt_site, stp_site, reset
     )
 
 
-class LUNAPlatformRev0D2(LatticeECP5Platform):
+class AmaltheaPlatformRev0D1(LatticeECP5Platform):
     """ Board description for the pre-release r0.1 revision of LUNA. """
 
-    name        = "LUNA r0.2"
+    name        = "Amalthea r0.1"
 
     device      = "LFE5U-12F"
     package     = "BG256"
@@ -99,15 +99,6 @@ class LUNAPlatformRev0D2(LatticeECP5Platform):
             Attrs(IO_TYPE="LVCMOS33")
         ),
 
-        #
-        # Note: r0.1 has a DFM issue that makes it difficult to solder a BGA with
-        # reliable connections on the intended SCK pin (P12), and lacks a CS pin on the
-        # debug SPI; which seems like a silly omission.
-        #
-        # Accordingly, we're mapping the debug SPI and UART over the same pins, as the
-        # microcontroller can use either.
-        #
-
         # UART connected to the debug controller; can be routed to a host via CDC-ACM.
         Resource("uart", 0,
             Subsignal("rx",   Pins("R14", dir="i")),
@@ -139,16 +130,8 @@ class LUNAPlatformRev0D2(LatticeECP5Platform):
             data_sites="R2 R1 P2 P1 N1 M2 M1 L2", clk_site="R4",
             dir_site="T3", nxt_site="T2", stp_site="T4", reset_site="R3"),
         ULPIResource("host_phy",
-            data_sites="G2 G1 F2 F1 E1 D1 C1 B1", clk_site="K2",
+            data_sites="G2 G1 F2 F1 E1 D1 C1 C2", clk_site="K2",
             dir_site="J1", nxt_site="H2", stp_site="J2", reset_site="K1"),
-        ULPIResource("target_phy",
-            data_sites="D16 E15 E16 F15 F16 G15 J16 K16", clk_site="B15",
-            dir_site="C15", nxt_site="C16", stp_site="B16", reset_site="G16"),
-
-        # Target port power switching.
-        Resource("power_a_port",       0, Pins("C14", dir="o"), Attrs(IO_TYPE="LVCMOS33")),
-        Resource("pass_through_vbus",  0, Pins("D14", dir="o"), Attrs(IO_TYPE="LVCMOS33")),
-        Resource("target_vbus_fault",  0, Pins("K15", dir="i"), Attrs(IO_TYPE="LVCMOS33")),
 
         # HyperRAM (1V8 domain).
         Resource("ram", 0,
@@ -164,6 +147,7 @@ class LUNAPlatformRev0D2(LatticeECP5Platform):
         ),
 
         # User I/O connections.
+        # TODO: Update these for io0+/- & io1+/-
         Resource("user_io", 0, Pins("A5", dir="io"), Attrs(IO_TYPE="LVCMOS33", SLEWRATE="FAST")),
         Resource("user_io", 1, Pins("A4", dir="io"), Attrs(IO_TYPE="LVCMOS33", SLEWRATE="FAST")),
         Resource("user_io", 2, Pins("A3", dir="io"), Attrs(IO_TYPE="LVCMOS33", SLEWRATE="FAST")),
