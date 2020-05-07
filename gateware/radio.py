@@ -44,20 +44,10 @@ class Radio(Elaboratable):
 
             return m
 
-# TODO: define this upstream somewhere
-SYNC_FREQ = 120e6
-
 DelayState = namedtuple("DelayState", "delay next_state")
-# From 4.2.5 "SPI Timing" & Table 10-29. "SPI Timing Characteristics"
-DELAY_STATES = {
-    "SEL_TO_SCLK":  DelayState(ceil(SYNC_FREQ *  50e-9), "SHIFT"), # tSPI_0
-    "BYTE_TO_BYTE": DelayState(ceil(SYNC_FREQ * 125e-9), "SHIFT"), # tSPI_5
-    "IDLE_TIME":    DelayState(ceil(SYNC_FREQ *  50e-9), "IDLE"),  # tSPI_8
-    "SCLK_TO_SEL":  DelayState(ceil(SYNC_FREQ *  45e-9), "END"),   # tSPI_9
-}
 
 class RadioSPI(Elaboratable):
-    def __init__(self):
+    def __init__(self, clk_freq):
         self.start       = Signal()
         self.busy        = Signal()
         self.write       = Signal()
@@ -70,18 +60,28 @@ class RadioSPI(Elaboratable):
         self.mosi = Signal()
         self.miso = Signal()
 
-        self._delay_counter = Signal(range(max(map(attrgetter("delay"), DELAY_STATES.values()))+1))
+        self._clk_freq = clk_freq
+
+        # From 4.2.5 "SPI Timing" & Table 10-29. "SPI Timing Characteristics"
+        self._delay_states = {
+            "SEL_TO_SCLK":  DelayState(ceil(clk_freq *  50e-9), "SHIFT"), # tSPI_0
+            "BYTE_TO_BYTE": DelayState(ceil(clk_freq * 125e-9), "SHIFT"), # tSPI_5
+            "IDLE_TIME":    DelayState(ceil(clk_freq *  50e-9), "IDLE"),  # tSPI_8
+            "SCLK_TO_SEL":  DelayState(ceil(clk_freq *  45e-9), "END"),   # tSPI_9
+        }
+
+        self._delay_counter = Signal(range(max(map(attrgetter("delay"), self._delay_states.values()))+1))
 
 
     def enter_delay_state(self, m, state):
-        m.d.sync += self._delay_counter.eq(DELAY_STATES[state].delay)
+        m.d.sync += self._delay_counter.eq(self._delay_states[state].delay)
         m.next = state
 
     def elaborate(self, platform):
         m = Module()
 
         SPI_FREQ = 20e6
-        CLKS_PER_HALFBIT = int(SYNC_FREQ // (SPI_FREQ * 2))
+        CLKS_PER_HALFBIT = int(self._clk_freq // (SPI_FREQ * 2))
         sclk_counter = Signal(range(CLKS_PER_HALFBIT))
 
         # Shift register for 4.2.3 "Single Access Mode" transaction.
@@ -138,10 +138,10 @@ class RadioSPI(Elaboratable):
                 self.enter_delay_state(m, "IDLE_TIME")
 
 
-            for state in DELAY_STATES:
+            for state in self._delay_states:
                 with m.State(state):
                     with m.If(self._delay_counter == 0):
-                        m.next = DELAY_STATES[state].next_state
+                        m.next = self._delay_states[state].next_state
                     with m.Else():
                         m.d.sync += self._delay_counter.eq(self._delay_counter - 1)
 
@@ -152,10 +152,11 @@ class RadioSPI(Elaboratable):
 
 class TestRadioSPI(unittest.TestCase):
     def test_radiospi(self):
-        m = RadioSPI()
+        clk = 60e6
+        m = RadioSPI(clk_freq=clk)
 
         sim = Simulator(m)
-        sim.add_clock(1/SYNC_FREQ)
+        sim.add_clock(1/clk)
 
         def process():
             yield m.address.eq(0x3EAB)
