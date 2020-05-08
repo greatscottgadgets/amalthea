@@ -19,6 +19,8 @@ from luna.gateware.interface.psram    import HyperRAMInterface
 
 from luna.apollo.support.selftest     import ApolloSelfTestCase, named_test
 
+from radio                            import RadioSPI
+
 #
 # Clock frequencies for each of the domains.
 # Can be modified to test at faster or slower frequencies.
@@ -48,6 +50,9 @@ REGISTER_SIDEBAND_RXCMD = 15
 REGISTER_RAM_REG_ADDR   = 20
 REGISTER_RAM_VALUE      = 21
 
+REGISTER_RADIO_ADDR     = 22
+REGISTER_RADIO_VALUE    = 23
+
 class InteractiveSelftest(Elaboratable, ApolloSelfTestCase):
     """ Hardware meant to demonstrate use of the Debug Controller's register interface.
 
@@ -66,6 +71,9 @@ class InteractiveSelftest(Elaboratable, ApolloSelfTestCase):
 
         20 -- HyperRAM register address
         21 -- HyperRAM register value
+
+        22 -- Radio register address
+        23 -- Radio register value
     """
 
     def elaborate(self, platform):
@@ -183,6 +191,36 @@ class InteractiveSelftest(Elaboratable, ApolloSelfTestCase):
             gateware_sdo          .eq(spi_registers.spi.sdo),
             spi_registers.spi.cs  .eq(spi.cs)
         ]
+
+
+        # Radio SPI window
+        radio = platform.request("radio")
+        radio_spi = RadioSPI(clk_freq=CLOCK_FREQUENCIES["sync"] * 1e6)
+        m.submodules += radio_spi
+
+        radio_address_changed = Signal()
+        radio_address = spi_registers.add_register(REGISTER_RADIO_ADDR, write_strobe=radio_address_changed)
+
+        spi_registers.add_sfr(REGISTER_RADIO_VALUE, read=radio_spi.read_value)
+
+        # Hook up our radio.
+        m.d.comb += [
+            radio.rst          .eq(0),
+
+            # SPI outputs
+            radio.sel          .eq(radio_spi.sel),
+            radio.sclk         .eq(radio_spi.sclk),
+            radio.mosi         .eq(radio_spi.mosi),
+
+            # SPI inputs
+            radio_spi.miso     .eq(radio.miso),
+
+            radio_spi.write    .eq(0),
+            radio_spi.start    .eq(radio_address_changed),
+            radio_spi.address  .eq(radio_address),
+        ]
+
+
 
         return m
 
@@ -310,6 +348,17 @@ class InteractiveSelftest(Elaboratable, ApolloSelfTestCase):
             raise AssertionError(f"PHY register {address} was {actual_value}, not expected {expected_value}")
 
 
+    def assertRadioRegister(self, address: int, expected_value: int):
+        """ Assertion that fails iff a Radio register doesn't hold the expected value. """
+
+        self.dut.spi.register_write(REGISTER_RADIO_ADDR, address)
+        self.dut.spi.register_write(REGISTER_RADIO_ADDR, address)
+        actual_value =  self.dut.spi.register_read(REGISTER_RADIO_VALUE)
+
+        if actual_value != expected_value:
+            raise AssertionError(f"Radio register {address} was {actual_value}, not expected {expected_value}")
+
+
     @named_test("Debug module")
     def test_debug_connection(self, dut):
         self.assertRegisterValue(1, 0x54455354)
@@ -328,6 +377,11 @@ class InteractiveSelftest(Elaboratable, ApolloSelfTestCase):
     @named_test("HyperRAM")
     def test_hyperram(self, dut):
         self.assertHyperRAMRegister(0, 0x0c81)
+
+
+    @named_test("Radio")
+    def test_radio(self, dut):
+        self.assertRadioRegister(0xd, 0x35)
 
 
 
