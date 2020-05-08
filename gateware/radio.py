@@ -111,12 +111,10 @@ class RadioSPI(Elaboratable):
                 with m.If(sclk_counter == 0):
                     m.d.sync += self.sclk.eq(~self.sclk)
 
-                    with m.If(self.sclk): # Falling edge: shift MSb out
+                    with m.If(self.sclk): # Rising edge, shift some data.
                         m.d.sync += self.mosi.eq(data[-1])
                         m.d.sync += data.eq(Cat(0, data[:-1]))
                         m.d.sync += bits_remaining.eq(bits_remaining - 1)
-
-                    with m.Else(): # Rising edge: shift data in
                         m.d.sync += self.read_value.eq(Cat(self.miso, self.read_value[:-1]))
 
                     m.d.sync += sclk_counter.eq(CLKS_PER_HALFBIT-1)
