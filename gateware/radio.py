@@ -80,8 +80,10 @@ class RadioSPI(Elaboratable):
     def elaborate(self, platform):
         m = Module()
 
-        SPI_FREQ = 20e6
+        SPI_FREQ = 15e6
+        assert (self._clk_freq / 2) % SPI_FREQ == 0.0
         CLKS_PER_HALFBIT = int(self._clk_freq // (SPI_FREQ * 2))
+        assert CLKS_PER_HALFBIT > 0
         sclk_counter = Signal(range(CLKS_PER_HALFBIT))
 
         # Shift register for 4.2.3 "Single Access Mode" transaction.
