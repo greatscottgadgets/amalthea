@@ -201,7 +201,12 @@ class InteractiveSelftest(Elaboratable, ApolloSelfTestCase):
         radio_address_changed = Signal()
         radio_address = spi_registers.add_register(REGISTER_RADIO_ADDR, write_strobe=radio_address_changed)
 
-        spi_registers.add_sfr(REGISTER_RADIO_VALUE, read=radio_spi.read_value)
+        radio_value_changed = Signal()
+        spi_registers.add_sfr(REGISTER_RADIO_VALUE,
+            read=radio_spi.read_value,
+            write_signal=radio_spi.write_value,
+            write_strobe=radio_value_changed,
+        )
 
         # Hook up our radio.
         m.d.comb += [
@@ -215,8 +220,8 @@ class InteractiveSelftest(Elaboratable, ApolloSelfTestCase):
             # SPI inputs
             radio_spi.miso     .eq(radio.miso),
 
-            radio_spi.write    .eq(0),
-            radio_spi.start    .eq(radio_address_changed),
+            radio_spi.write    .eq(radio_value_changed),
+            radio_spi.start    .eq(radio_address_changed | radio_value_changed),
             radio_spi.address  .eq(radio_address),
         ]
 
@@ -351,6 +356,7 @@ class InteractiveSelftest(Elaboratable, ApolloSelfTestCase):
     def assertRadioRegister(self, address: int, expected_value: int):
         """ Assertion that fails iff a Radio register doesn't hold the expected value. """
 
+        # TODO: figure out why this needs to be written twice
         self.dut.spi.register_write(REGISTER_RADIO_ADDR, address)
         self.dut.spi.register_write(REGISTER_RADIO_ADDR, address)
         actual_value =  self.dut.spi.register_read(REGISTER_RADIO_VALUE)
