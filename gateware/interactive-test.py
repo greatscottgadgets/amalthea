@@ -5,6 +5,7 @@
 
 import operator
 from functools import reduce
+import time
 
 from nmigen import Signal, Elaboratable, Module, Cat, ClockDomain, ClockSignal, ResetSignal
 from nmigen.lib.cdc import FFSynchronizer
@@ -52,6 +53,7 @@ REGISTER_RAM_VALUE      = 21
 
 REGISTER_RADIO_ADDR     = 22
 REGISTER_RADIO_VALUE    = 23
+REGISTER_RADIO_SYNC     = 24
 
 class InteractiveSelftest(Elaboratable, ApolloSelfTestCase):
     """ Hardware meant to demonstrate use of the Debug Controller's register interface.
@@ -74,6 +76,7 @@ class InteractiveSelftest(Elaboratable, ApolloSelfTestCase):
 
         22 -- Radio register address
         23 -- Radio register value
+        24 -- Radio loop-back syncronisation state
     """
 
     def elaborate(self, platform):
@@ -92,9 +95,9 @@ class InteractiveSelftest(Elaboratable, ApolloSelfTestCase):
         spi_registers.add_read_only_register(REGISTER_ID, read=0x54455354)
 
         # LED test register.
-        led_reg = spi_registers.add_register(REGISTER_LEDS, size=6, name="leds", reset=0b10)
+        led_reg = spi_registers.add_register(REGISTER_LEDS, size=5, name="leds", reset=0b1)
         led_out   = Cat([platform.request("led", i, dir="o") for i in range(0, 6)])
-        m.d.comb += led_out.eq(led_reg)
+        m.d.comb += led_out[1:].eq(led_reg)
 
         #
         # User IO GPIO registers.
@@ -225,6 +228,51 @@ class InteractiveSelftest(Elaboratable, ApolloSelfTestCase):
             radio_spi.address  .eq(radio_address),
         ]
 
+        # Radio LVDS loop-back
+
+        # Set up radio clock domain from rxclk, and pass it through to txclk
+        m.domains.radio = ClockDomain()
+        m.d.comb += [
+            ClockSignal("radio").eq(radio.rxclk),
+            ResetSignal("radio").eq(ResetSignal()),
+            radio.txclk.eq(ClockSignal("radio")),
+        ]
+
+        # TX a pattern
+        tx = Signal(8, reset=0x2e)
+        m.d.radio += [
+            tx.eq(Cat(tx[7], tx[:-1])),
+            radio.txd.eq(tx[7]),
+        ]
+
+        # ... and receive it back.
+        rx = Signal(8)
+        rx_counter = Signal(range(8))
+        m.d.radio += rx.eq(Cat(radio.rxd09, rx[:-1]))
+        m.d.radio += rx_counter.eq(rx_counter - 1)
+
+        # Sync up to the pattern
+        got_sync = Signal()
+        with m.FSM() as fsm:
+            with m.State("start"):
+                with m.If(rx == 0x2e):
+                    m.next = "sync"
+                    m.d.radio += got_sync.eq(1)
+                    m.d.radio += rx_counter.eq(7)
+
+            with m.State("sync"):
+                with m.If(rx_counter == 0):
+                    with m.If(rx != 0x2e):
+                        m.next = "start"
+                        m.d.radio += got_sync.eq(0)
+
+            with m.State("error"):
+                pass
+
+        got_sync_reg = Signal()
+        m.submodules += FFSynchronizer(got_sync, got_sync_reg)
+        spi_registers.add_read_only_register(REGISTER_RADIO_SYNC, read=got_sync_reg)
+        m.d.comb += led_out[0].eq(got_sync)
 
 
         return m
@@ -388,6 +436,16 @@ class InteractiveSelftest(Elaboratable, ApolloSelfTestCase):
     @named_test("Radio")
     def test_radio(self, dut):
         self.assertRadioRegister(0xd, 0x35)
+
+        # Enable loop-back
+        self.dut.spi.register_write(REGISTER_RADIO_ADDR, 0xa)
+        self.dut.spi.register_write(REGISTER_RADIO_ADDR, 0xa)
+        self.dut.spi.register_write(REGISTER_RADIO_VALUE, 0x96)
+
+        time.sleep(2)
+
+        if self.dut.spi.register_read(REGISTER_RADIO_SYNC) != 1:
+            raise AssertionError(f"Radio LVDS loop-back failed to sync")
 
 
 
