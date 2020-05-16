@@ -44,6 +44,7 @@ class Radio(Elaboratable):
 
             return m
 
+
 DelayState = namedtuple("DelayState", "delay next_state")
 
 class RadioSPI(Elaboratable):
@@ -149,7 +150,6 @@ class RadioSPI(Elaboratable):
         return m
 
             
-
 class TestRadioSPI(unittest.TestCase):
     def test_radiospi(self):
         clk = 60e6
@@ -173,6 +173,79 @@ class TestRadioSPI(unittest.TestCase):
         sim.add_sync_process(process)
         with sim.write_vcd("radiospi.vcd", "radiospi.gtkw", traces=[]):
             sim.run()
+
+I_SYNC = 0b10
+Q_SYNC = 0b01
+
+class IQReceiver(Elaboratable):
+    def __init__(self):
+        self.rxd          = Signal()
+        self.sample       = Signal(14)
+        self.sample_valid = Signal()
+
+    def elaborate(self, platform):
+        m = Module()
+
+        rxd_delay = Signal()
+        data      = Signal(2)
+
+        m.submodules += [
+            Instance("DELAYG",
+                p_DEL_MODE="SCLK_CENTERED",
+                i_A=self.rxd,
+                o_Z=rxd_delay,
+            ),
+            Instance("IDDRX1F",
+                i_D=rxd_delay,
+                i_SCLK=ClockSignal(),
+                i_RST=ResetSignal(),
+                o_Q0=data[1],
+                o_Q1=data[0],
+            ),
+        ]
+
+        data_count = Signal(3)
+        m.d.sync += self.sample_valid.eq(0)
+        with m.FSM() as fsm:
+            with m.State("I_SYNC"):
+                with m.If(data == I_SYNC):
+                    m.next = "I_DATA"
+                    m.d.sync += [
+                        data_count.eq(0),
+                    ]
+
+            with m.State("I_DATA"):
+                with m.If(data_count == 6):
+                    m.d.sync += self.sample_valid.eq(1)
+                    m.next = "Q_SYNC"
+
+                m.d.sync += [
+                    self.sample.eq(Cat(data, self.sample)),
+                    data_count.eq(data_count + 1)
+                ]
+
+            with m.State("Q_SYNC"):
+                with m.If(data == Q_SYNC):
+                    m.next = "Q_DATA"
+                    m.d.sync += [
+                        data_count.eq(0),
+                    ]
+                with m.Else():
+                    m.next = "I_SYNC"
+
+            with m.State("Q_DATA"):
+                with m.If(data_count == 6):
+                    m.d.sync += self.sample_valid.eq(1)
+                    m.next = "I_SYNC"
+
+                m.d.sync += [
+                    self.sample.eq(Cat(data, self.sample)),
+                    data_count.eq(data_count + 1)
+                ]
+
+
+            return m
+
 
 if __name__ == "__main__":
    unittest.main()

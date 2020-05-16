@@ -12,6 +12,8 @@ import time
 import usb1
 
 from nmigen                          import *
+from nmigen.lib.fifo                 import AsyncFIFO
+from nmigen.asserts                  import Past
 from usb_protocol.types              import USBRequestType
 from usb_protocol.emitters           import DeviceDescriptorCollection
 
@@ -20,7 +22,7 @@ from luna.gateware.usb.usb2.device   import USBDevice
 from luna.gateware.usb.usb2.endpoint import USBStreamInEndpoint
 from luna.gateware.usb.usb2.request  import USBRequestHandler
 
-from radio                           import RadioSPI
+from radio                           import IQReceiver, RadioSPI
 
 
 VENDOR_ID  = 0x16d0
@@ -30,7 +32,7 @@ BULK_ENDPOINT_NUMBER = 1
 MAX_BULK_PACKET_SIZE = 64 if os.getenv('LUNA_FULL_ONLY') else 512
 
 # Set the total amount of data to be used in our speed test.
-TEST_DATA_SIZE = 1 * 1024 * 1024
+TEST_DATA_SIZE = 100 * 1024 * 1024
 TEST_TRANSFER_SIZE = 16 * 1024
 
 # Size of the host-size "transfer queue" -- this is effectively the number of async transfers we'll
@@ -188,17 +190,40 @@ class USBInSpeedTestDevice(Elaboratable):
         )
         usb.add_endpoint(stream_ep)
 
-        # Send entirely zeroes, as fast as we can.
-        m.d.comb += [
-            stream_ep.stream.valid    .eq(1),
-            stream_ep.stream.payload  .eq(0)
-        ]
-
         # Connect our device as a high speed device by default.
         m.d.comb += [
             usb.connect          .eq(1),
             usb.full_speed_only  .eq(1 if os.getenv('LUNA_FULL_ONLY') else 0),
         ]
+
+        # Create radio clock domain
+        m.domains.radio = ClockDomain()
+        m.d.comb += [
+            ClockSignal("radio").eq(radio.rxclk),
+            ResetSignal("radio").eq(ResetSignal()),
+        ]
+
+        # Set up radio receiver interface
+        fifo  = AsyncFIFO(width=8, depth=2, r_domain="usb", w_domain="radio")
+        iq_rx = DomainRenamer("radio")(IQReceiver())
+
+        # Mux between MSB/LSB, MSB first
+        sample_data = Mux(iq_rx.sample_valid, iq_rx.sample[6:14], Cat(Const(0, 3), iq_rx.sample[1:6]))
+
+        m.submodules += [fifo, iq_rx]
+        m.d.comb += [
+            iq_rx.rxd                  .eq(radio.rxd24),
+            fifo.w_en                  .eq(iq_rx.sample_valid | Past(iq_rx.sample_valid)),
+            fifo.w_data                .eq(sample_data),
+            fifo.r_en                  .eq(1),
+            stream_ep.stream.valid     .eq(Past(fifo.r_rdy)),
+            stream_ep.stream.payload   .eq(fifo.r_data),
+        ]
+
+        led0 = platform.request("led", 0)
+        m.d.radio += led0.eq(iq_rx.sample_valid)
+        led1 = platform.request("led", 1)
+        m.d.usb += led1.eq(fifo.r_rdy)
 
         return m
 
@@ -218,8 +243,11 @@ def run_speed_test():
         6: "sent more data than expected."
     }
 
+    f = open('data', 'wb')
+
     def _should_terminate():
         """ Returns true iff our test should terminate. """
+        return failed_out
         return (total_data_exchanged > TEST_DATA_SIZE) or failed_out
 
 
@@ -234,6 +262,7 @@ def run_speed_test():
 
             # Count the data exchanged in this packet...
             total_data_exchanged += transfer.getActualLength()
+            f.write(transfer.getBuffer())
 
             # ... and if we should terminate, abort.
             if _should_terminate():
@@ -261,7 +290,7 @@ def run_speed_test():
         # 24 -> RX
         device.controlWrite(usb1.REQUEST_TYPE_VENDOR, 0, 0x5, 0x0203, [])
 
-        return
+
         # Submit a set of transfers to perform async comms with.
         active_transfers = []
         for _ in range(TRANSFER_QUEUE_DEPTH):
@@ -277,17 +306,21 @@ def run_speed_test():
         # Start our benchmark timer.
         start_time = time.time()
 
+
         # Submit our transfers all at once.
-        #for transfer in active_transfers:
-        #    transfer.submit()
+        for transfer in active_transfers:
+            transfer.submit()
 
         # Run our transfers until we get enough data.
         while not _should_terminate():
             context.handleEvents()
 
+
         # Figure out how long this took us.
         end_time = time.time()
         elapsed = end_time - start_time
+
+        f.close()
 
         # Cancel all of our active transfers.
         for transfer in active_transfers:
