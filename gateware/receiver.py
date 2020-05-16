@@ -60,22 +60,22 @@ class RadioSPIRequestHandler(USBRequestHandler):
         m.d.sync += self.spi_start.eq(0)
 
         with m.If(setup.type == USBRequestType.VENDOR):
-            with m.Switch(setup.request):
-
-                with m.Case(self.REQUEST_WRITE_REG):
-
+            with m.FSM():
+                with m.State('IDLE'):
                     with m.If(setup.received):
-                        with m.If(self.spi_busy):
-                            # TODO: set flag so we nak later
-                            pass
-                        with m.Else():
-                            m.d.sync += [
-                                self.spi_address.eq(setup.index[:14]),
-                                self.spi_write_value.eq(setup.value[:8]),
-                                self.spi_start.eq(1),
-                            ],
+                        with m.Switch(setup.request):
+                            with m.Case(self.REQUEST_WRITE_REG):
+                                m.d.sync += [
+                                    self.spi_address.eq(setup.index[:14]),
+                                    self.spi_write_value.eq(setup.value[:8]),
+                                    self.spi_start.eq(1),
+                                ],
+                                m.next = 'WRITE_REG'
 
+                            with m.Default():
+                                m.next = 'UNHANDLED'
 
+                with m.State('WRITE_REG'):
                     # Once the receive is complete, respond with an ACK.
                     with m.If(interface.rx_ready_for_response):
                         m.d.comb += interface.handshakes_out.ack.eq(1)
@@ -83,15 +83,17 @@ class RadioSPIRequestHandler(USBRequestHandler):
                     # If we reach the status stage, send a ZLP.
                     with m.If(interface.status_requested):
                         m.d.comb += self.send_zlp()
+                        m.next = 'IDLE'
 
 
-                with m.Case():
+                with m.State('UNHANDLED'):
 
                     #
                     # Stall unhandled requests.
                     #
                     with m.If(interface.status_requested | interface.data_requested):
                         m.d.comb += interface.handshakes_out.stall.eq(1)
+                        m.next = 'IDLE'
 
                 return m
 
@@ -156,10 +158,10 @@ class USBInSpeedTestDevice(Elaboratable):
         control_ep = usb.add_standard_control_endpoint(descriptors)
 
         # Add our vendor request handler
-        handler = RadioSPIRequestHandler()
+        handler = DomainRenamer("usb")(RadioSPIRequestHandler())
         control_ep.add_request_handler(handler)
 
-        radio_spi = RadioSPI(clk_freq=120e6)
+        radio_spi = DomainRenamer("usb")(RadioSPI(clk_freq=60e6))
         m.submodules += radio_spi
 
         m.d.comb += [
