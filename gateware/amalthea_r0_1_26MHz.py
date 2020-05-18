@@ -31,19 +31,30 @@ def ULPIResource(name, data_sites, clk_site, dir_site, nxt_site, stp_site, reset
     )
 
 
+class DomainGenerator(LunaECP5DomainGenerator):
+    def create_submodules(self, m, platform):
+        super().create_submodules(m, platform)
+
+        # Adjust PLL params for 26MHz input:
+        #   Divide CLKI down to 2MHz
+        #   Set CLKFB_DIV to 120 = CLKOP (240MHz) / 2MHz
+        m.submodules.pll.parameters['CLKI_DIV']  = 13
+        m.submodules.pll.parameters['CLKFB_DIV'] = 120
+
+
 class AmaltheaPlatformRev0D1(LatticeECP5Platform):
     """ Board description for the pre-release r0.1 revision of LUNA. """
 
-    name        = "Amalthea r0.1"
+    name        = "Amalthea r0.1 (26MHz mod)"
 
     device      = "LFE5U-12F"
     package     = "BG256"
     speed       = os.getenv("LUNA_SPEED_GRADE", "8")
 
-    default_clk = "clk_60MHz"
+    default_clk = "clk_26MHz"
 
     # Provide the type that'll be used to create our clock domains.
-    clock_domain_generator = LunaECP5DomainGenerator
+    clock_domain_generator = DomainGenerator
 
     #
     # Default clock frequencies for each of our clock domains.
@@ -78,9 +89,9 @@ class AmaltheaPlatformRev0D1(LatticeECP5Platform):
     #
     resources   = [
 
-        # Primary, discrete 60MHz oscillator.
-        Resource("clk_60MHz", 0, Pins("A7", dir="i"),
-            Clock(60e6), Attrs(IO_TYPE="LVCMOS33")),
+        # 26MHz clock from AT86RF215 CLKOUT.
+        Resource("clk_26MHz", 0, Pins("A7", dir="i"),
+            Clock(26e6), Attrs(IO_TYPE="LVCMOS33")),
 
         # Connection to our SPI flash; can be used to work with the flash
         # from e.g. a bootloader.
