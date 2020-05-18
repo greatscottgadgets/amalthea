@@ -18,8 +18,7 @@ from usb_protocol.types              import USBRequestType
 from usb_protocol.emitters           import DeviceDescriptorCollection
 
 from luna                            import top_level_cli
-from luna.gateware.usb.usb2.device   import USBDevice
-from luna.gateware.usb.usb2.endpoint import USBStreamInEndpoint
+from luna.usb2                       import *
 from luna.gateware.usb.usb2.request  import USBRequestHandler
 
 from radio                           import IQReceiver, RadioSPI
