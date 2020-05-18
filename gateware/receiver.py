@@ -22,6 +22,7 @@ from luna.usb2                       import *
 from luna.gateware.usb.usb2.request  import USBRequestHandler
 
 from radio                           import IQReceiver, RadioSPI
+from util                            import Serializer
 
 
 VENDOR_ID  = 0x16d0
@@ -202,27 +203,76 @@ class USBInSpeedTestDevice(Elaboratable):
             ResetSignal("radio").eq(ResetSignal()),
         ]
 
-        # Set up radio receiver interface
-        fifo  = AsyncFIFO(width=8, depth=2, r_domain="usb", w_domain="radio")
-        iq_rx = DomainRenamer("radio")(IQReceiver())
+        # Get IQ samples & serialize them to bytes ready for USB.
+        iq_rx = IQReceiver()
+        ser = Serializer(w_width=32, r_width=8)
+        m.submodules += [
+            DomainRenamer("radio")(iq_rx),
+            DomainRenamer("radio")(ser),
+        ]
 
-        # Mux between MSB/LSB, MSB first
-        sample_data = Mux(iq_rx.sample_valid, iq_rx.sample[6:14], Cat(Const(0, 3), iq_rx.sample[1:6]))
-
-        m.submodules += [fifo, iq_rx]
+        iq_sample = Cat(
+            # 13-bit samples, swapped to little endian & padded to 16-bit each.
+            iq_rx.q_sample[-8:], Const(0, 3), iq_rx.q_sample[1:-8],
+            iq_rx.i_sample[-8:], Const(0, 3), iq_rx.i_sample[1:-8],
+        )
         m.d.comb += [
-            iq_rx.rxd                  .eq(radio.rxd24),
-            fifo.w_en                  .eq(iq_rx.sample_valid | Past(iq_rx.sample_valid)),
-            fifo.w_data                .eq(sample_data),
-            fifo.r_en                  .eq(1),
-            stream_ep.stream.valid     .eq(Past(fifo.r_rdy)),
+            iq_rx.rxd  .eq(radio.rxd24),
+            ser.w_data .eq(iq_sample),
+            ser.w_en   .eq(iq_rx.sample_valid),
+        ]
+
+        fifo  = AsyncFIFO(width=8, depth=2048, r_domain="usb", w_domain="radio")
+        m.submodules += fifo
+        m.d.comb += [
+            ser.r_en                   .eq(fifo.w_rdy),
+            fifo.w_en                  .eq(ser.r_rdy),
+            fifo.w_data                .eq(ser.r_data),
+            fifo.r_en                  .eq(stream_ep.stream.ready),
+            stream_ep.stream.valid     .eq(fifo.r_rdy),
             stream_ep.stream.payload   .eq(fifo.r_data),
         ]
 
         led0 = platform.request("led", 0)
         m.d.radio += led0.eq(iq_rx.sample_valid)
         led1 = platform.request("led", 1)
-        m.d.usb += led1.eq(fifo.r_rdy)
+        m.d.usb += led1.eq(stream_ep.stream.valid)
+        led2 = platform.request("led", 2)
+        m.d.radio += led2.eq(fifo.w_en)
+
+        tx_start_delay = Signal(26)
+        m.d.radio += tx_start_delay.eq(tx_start_delay+1)
+
+        tx_shift_counter = Signal(range(17))
+        tx_shift_reg = Signal(32)
+        tx_value = Signal(13)
+        with m.If(tx_start_delay[-1]):
+            m.d.radio += tx_start_delay.eq(tx_start_delay)
+            with m.If(tx_shift_counter == 0):
+                m.d.radio += [
+                    tx_shift_counter.eq(15),
+                    tx_shift_reg.eq(Cat(0, tx_value,   Const(0b01, 2),
+                                        0, Const(0, 13),   Const(0b10, 2))),
+                    tx_value.eq(tx_value+1),
+                ],
+            with m.Else():
+                m.d.radio += [
+                    tx_shift_reg.eq(tx_shift_reg << 2),
+                    tx_shift_counter.eq(tx_shift_counter - 1),
+                ]
+
+        txd = Signal(2)
+        m.d.comb += [
+            radio.txclk.eq(ClockSignal("radio")),
+            txd.eq(tx_shift_reg[-2:]),
+        ]
+        m.submodules += Instance("ODDRX1F",
+            i_D0=txd[1],
+            i_D1=txd[0],
+            i_SCLK=ClockSignal("radio"),
+            i_RST=ResetSignal(),
+            o_Q=radio.txd,
+        )
 
         return m
 
@@ -242,7 +292,7 @@ def run_speed_test():
         6: "sent more data than expected."
     }
 
-    f = open('data', 'wb')
+    f = open('pipe', 'wb')
 
     def _should_terminate():
         """ Returns true iff our test should terminate. """
@@ -270,6 +320,11 @@ def run_speed_test():
             # Otherwise, re-submit the transfer.
             transfer.submit()
 
+        # Transfer timed out
+        #elif status in (2,):
+        #    print("timeout")
+        #    transfer.submit()
+
         else:
             failed_out = status
 
@@ -283,11 +338,28 @@ def run_speed_test():
         # ... and claim its bulk interface.
         device.claimInterface(0)
 
-        # 24 -> TXPREP
-        device.controlWrite(usb1.REQUEST_TYPE_VENDOR, 0, 0x3, 0x0203, [])
+        loop_back = False
+        if loop_back:
+            # Loop-back mode
+            device.controlWrite(usb1.REQUEST_TYPE_VENDOR, 0, 0x96, 0xa, [])
+        else:
+            # LVDS mode
+            device.controlWrite(usb1.REQUEST_TYPE_VENDOR, 0, 0x16, 0xa, [])
 
-        # 24 -> RX
-        device.controlWrite(usb1.REQUEST_TYPE_VENDOR, 0, 0x5, 0x0203, [])
+            freq = 2426
+            CCF0 = int((freq - 1500) / 0.025)
+            device.controlWrite(usb1.REQUEST_TYPE_VENDOR, 0, CCF0 & 0xff, 0x205, [])
+            device.controlWrite(usb1.REQUEST_TYPE_VENDOR, 0, (CCF0 >> 8) & 0xff, 0x206, [])
+            device.controlWrite(usb1.REQUEST_TYPE_VENDOR, 0, 0x0, 0x208, [])
+
+            # Disable AGC
+            device.controlWrite(usb1.REQUEST_TYPE_VENDOR, 0, 0x0, 0x20B, [])
+
+            # 24 -> TXPREP
+            device.controlWrite(usb1.REQUEST_TYPE_VENDOR, 0, 0x3, 0x0203, [])
+
+            # 24 -> RX
+            device.controlWrite(usb1.REQUEST_TYPE_VENDOR, 0, 0x5, 0x0203, [])
 
 
         # Submit a set of transfers to perform async comms with.
@@ -333,17 +405,17 @@ def run_speed_test():
 
 
         bytes_per_second = total_data_exchanged / elapsed
-        logging.warning(f"Exchanged {total_data_exchanged / 1000000}MB total at {bytes_per_second / 1000000}MB/s.")
+        logging.info(f"Exchanged {total_data_exchanged / 1000000}MB total at {bytes_per_second / 1000000}MB/s.")
 
 
 if __name__ == "__main__":
     device = top_level_cli(USBInSpeedTestDevice)
 
-    logging.warning("Giving the device time to connect...")
-    time.sleep(10)
+    logging.info("Giving the device time to connect...")
+    time.sleep(5)
 
     if device is not None:
-        logging.warning(f"Starting bulk in speed test.")
+        logging.info(f"Starting bulk in speed test.")
         run_speed_test()
 
 

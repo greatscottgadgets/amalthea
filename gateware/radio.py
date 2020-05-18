@@ -180,7 +180,8 @@ Q_SYNC = 0b01
 class IQReceiver(Elaboratable):
     def __init__(self):
         self.rxd          = Signal()
-        self.sample       = Signal(14)
+        self.i_sample     = Signal(14)
+        self.q_sample     = Signal(14)
         self.sample_valid = Signal()
 
     def elaborate(self, platform):
@@ -216,11 +217,10 @@ class IQReceiver(Elaboratable):
 
             with m.State("I_DATA"):
                 with m.If(data_count == 6):
-                    m.d.sync += self.sample_valid.eq(1)
                     m.next = "Q_SYNC"
 
                 m.d.sync += [
-                    self.sample.eq(Cat(data, self.sample)),
+                    self.i_sample.eq(Cat(data, self.i_sample)),
                     data_count.eq(data_count + 1)
                 ]
 
@@ -239,7 +239,7 @@ class IQReceiver(Elaboratable):
                     m.next = "I_SYNC"
 
                 m.d.sync += [
-                    self.sample.eq(Cat(data, self.sample)),
+                    self.q_sample.eq(Cat(data, self.q_sample)),
                     data_count.eq(data_count + 1)
                 ]
 
