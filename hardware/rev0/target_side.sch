@@ -971,9 +971,9 @@ SCLK
 Text Label 4650 3450 2    50   ~ 0
 ~SELN
 Text Label 4650 3550 2    50   ~ 0
-MOSI
+COPI
 Text Label 4650 3650 2    50   ~ 0
-MISO
+CIPO
 Text Notes 8550 2500 0    50   ~ 0
 TODO: swap 24/09 position to match physical layout
 Text Label 2400 5800 0    50   ~ 0
@@ -981,9 +981,9 @@ SCLK
 Text Label 2400 4600 0    50   ~ 0
 ~SELN
 Text Label 2400 4700 0    50   ~ 0
-MOSI
+COPI
 Text Label 2400 5500 0    50   ~ 0
-MISO
+CIPO
 Text HLabel 10400 2950 2    50   Input ~ 0
 RF24
 Text HLabel 10400 4300 2    50   Input ~ 0
