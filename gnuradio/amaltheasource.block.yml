@@ -1,0 +1,24 @@
+id: 'amalthea_source'
+label: 'Amalthea Source'
+category: '[Amalthea]'
+flags: throttle
+
+parameters:
+- id: sample_rate
+  label: 'Sample Rate (sps)'
+  default: '""'
+  dtype: real
+  default: samp_rate
+
+templates:
+  imports: from amalthea.gnuradio import amaltheasource
+  make: amaltheasource.AmaltheaSource(${sample_rate})
+
+
+outputs:
+- domain: stream
+  dtype: short
+  multiplicity: 1
+
+file_format: 1
+
