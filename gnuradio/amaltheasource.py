@@ -115,5 +115,6 @@ class AmaltheaSource(gr.sync_block):
         for transfer in self.active_transfers:
             if transfer.isSubmitted():
                 transfer.cancel()
+        return True
 
 
