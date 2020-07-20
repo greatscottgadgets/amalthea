@@ -6,13 +6,19 @@ flags: throttle
 parameters:
 - id: sample_rate
   label: 'Sample Rate (sps)'
-  default: '""'
   dtype: real
   default: samp_rate
 
+- id: freq
+  label: 'Frequency (Hz)'
+  dtype: real
+  default: 2450e6
+
 templates:
   imports: from amalthea.gnuradio import amaltheasource
-  make: amaltheasource.AmaltheaSource(${sample_rate})
+  make: amaltheasource.AmaltheaSource(${sample_rate}, ${freq})
+  callbacks:
+  - set_freq(${freq})
 
 
 outputs:

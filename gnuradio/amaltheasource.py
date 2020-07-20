@@ -40,13 +40,16 @@ class AmaltheaSource(gr.sync_block):
             # TODO: handle errors
             failed_out = status
 
-    def __init__(self, sample_rate, *args, **kwargs):
+    def __init__(self, sample_rate, freq):
         gr.sync_block.__init__(
             self,
             name=self.BLOCK_NAME,
             in_sig=None,
             out_sig=[self.OUTPUT_TYPE],
         )
+
+        self.sample_rate = sample_rate
+        self.freq        = freq
 
         self.buffer = np.array([], dtype=self.OUTPUT_TYPE)
 
@@ -58,26 +61,14 @@ class AmaltheaSource(gr.sync_block):
         # ... and claim its bulk interface.
         self.device.claimInterface(0)
 
-    def start(self):
         # LVDS mode
         self.device.controlWrite(usb1.REQUEST_TYPE_VENDOR, 0, 0x16, 0xa, [])
-
-        freq = 2426
-        CCF0 = int((freq - 1500) / 0.025)
-        self.device.controlWrite(usb1.REQUEST_TYPE_VENDOR, 0, CCF0 & 0xff, 0x205, [])
-        self.device.controlWrite(usb1.REQUEST_TYPE_VENDOR, 0, (CCF0 >> 8) & 0xff, 0x206, [])
-        self.device.controlWrite(usb1.REQUEST_TYPE_VENDOR, 0, 0x0, 0x208, [])
 
         # Disable AGC
         self.device.controlWrite(usb1.REQUEST_TYPE_VENDOR, 0, 0x0, 0x20B, [])
 
-        # 24 -> TXPREP
-        self.device.controlWrite(usb1.REQUEST_TYPE_VENDOR, 0, 0x3, 0x0203, [])
 
-        # 24 -> RX
-        self.device.controlWrite(usb1.REQUEST_TYPE_VENDOR, 0, 0x5, 0x0203, [])
-
-
+    def start(self):
         # Submit a set of transfers to perform async comms with.
         self.active_transfers = []
         for _ in range(TRANSFER_QUEUE_DEPTH):
@@ -94,6 +85,24 @@ class AmaltheaSource(gr.sync_block):
         for transfer in self.active_transfers:
             transfer.submit()
 
+        return True
+
+    def start_rx(self):
+        freq_mhz = self.freq / 1e6
+        CCF0 = int((freq_mhz - 1500) / 0.025)
+        self.device.controlWrite(usb1.REQUEST_TYPE_VENDOR, 0, CCF0 & 0xff, 0x205, [])
+        self.device.controlWrite(usb1.REQUEST_TYPE_VENDOR, 0, (CCF0 >> 8) & 0xff, 0x206, [])
+        self.device.controlWrite(usb1.REQUEST_TYPE_VENDOR, 0, 0x0, 0x208, [])
+
+        # 24 -> TXPREP
+        self.device.controlWrite(usb1.REQUEST_TYPE_VENDOR, 0, 0x3, 0x0203, [])
+
+        # 24 -> RX
+        self.device.controlWrite(usb1.REQUEST_TYPE_VENDOR, 0, 0x5, 0x0203, [])
+
+    def set_freq(self, freq):
+        self.freq = freq
+        self.start_rx()
         return True
 
     def work(self, input_items, output_items):
