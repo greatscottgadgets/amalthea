@@ -90,15 +90,15 @@ class AmaltheaSource(gr.sync_block):
     def start_rx(self):
         freq_mhz = self.freq / 1e6
         CCF0 = int((freq_mhz - 1500) / 0.025)
-        self.device.controlWrite(usb1.REQUEST_TYPE_VENDOR, 0, CCF0 & 0xff, 0x205, [])
-        self.device.controlWrite(usb1.REQUEST_TYPE_VENDOR, 0, (CCF0 >> 8) & 0xff, 0x206, [])
-        self.device.controlWrite(usb1.REQUEST_TYPE_VENDOR, 0, 0x0, 0x208, [])
+        self.write_reg(CCF0 & 0xff, 0x205)
+        self.write_reg((CCF0 >> 8) & 0xff, 0x206)
+        self.write_reg(0x0, 0x208)
 
         # 24 -> TXPREP
-        self.device.controlWrite(usb1.REQUEST_TYPE_VENDOR, 0, 0x3, 0x0203, [])
+        self.write_reg(0x3, 0x0203)
 
         # 24 -> RX
-        self.device.controlWrite(usb1.REQUEST_TYPE_VENDOR, 0, 0x5, 0x0203, [])
+        self.write_reg(0x5, 0x0203)
 
     def set_freq(self, freq):
         self.freq = freq
@@ -126,4 +126,6 @@ class AmaltheaSource(gr.sync_block):
                 transfer.cancel()
         return True
 
+    def write_reg(self, reg, value):
+        self.device.controlWrite(usb1.REQUEST_TYPE_VENDOR, 0, reg, value, [])
 
