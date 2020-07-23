@@ -157,7 +157,7 @@ class AmaltheaPlatformRev0D1(LatticeECP5Platform):
 
             Subsignal("irq",   Pins( "F15", dir="i")),
 
-            Subsignal("rxclk", DiffPairs("J16", "J15", dir="i"), Attrs(IO_TYPE="LVDS", DIFFRESISTOR="100", PULLMODE="UP")),
+            Subsignal("rxclk", DiffPairs("J16", "J15", dir="i"), Attrs(IO_TYPE="LVDS", DIFFRESISTOR="100", PULLMODE="UP"), Clock(64e6)),
             Subsignal("rxd09", DiffPairs("D16", "E15", dir="i"), Attrs(IO_TYPE="LVDS", DIFFRESISTOR="100")),
             Subsignal("rxd24", DiffPairs("K16", "K15", dir="i"), Attrs(IO_TYPE="LVDS", DIFFRESISTOR="100")),
 
