@@ -180,8 +180,8 @@ Q_SYNC = 0b01
 class IQReceiver(Elaboratable):
     def __init__(self):
         self.rxd          = Signal()
-        self.i_sample     = Signal(14)
-        self.q_sample     = Signal(14)
+        self.i_sample     = Signal(signed(14))
+        self.q_sample     = Signal(signed(14))
         self.sample_valid = Signal()
 
     def elaborate(self, platform):
