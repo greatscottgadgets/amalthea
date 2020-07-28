@@ -213,8 +213,8 @@ class USBInSpeedTestDevice(Elaboratable):
 
         iq_sample = Cat(
             # 13-bit samples, swapped to little endian & padded to 16-bit each.
-            iq_rx.q_sample[-8:], Const(0, 3), iq_rx.q_sample[1:-8],
-            iq_rx.i_sample[-8:], Const(0, 3), iq_rx.i_sample[1:-8],
+            iq_rx.i_sample[1:] << 3,
+            iq_rx.q_sample[1:] << 3,
         )
         m.d.comb += [
             iq_rx.rxd  .eq(radio.rxd24),

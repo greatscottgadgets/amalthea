@@ -32,8 +32,8 @@ class Serializer(Elaboratable):
     def elaborate(self, platform):
         m = Module()
 
-        # Connect the top bits of the shift register to the output.
-        m.d.comb += self.r_data.eq(self._data[-self.r_data.width:])
+        # Connect the bottom bits of the shift register to the output.
+        m.d.comb += self.r_data.eq(self._data[:self.r_data.width])
 
         # Allow write if the shift register is empty or about to be empty.
         data_empty = self._count == 0
@@ -44,7 +44,7 @@ class Serializer(Elaboratable):
 
         with m.If(self.r_rdy & self.r_en):
             m.d.sync += [
-                self._data .eq(self._data << self.r_data.width),
+                self._data .eq(self._data >> self.r_data.width),
                 self._count.eq(self._count - 1),
             ]
 
@@ -66,7 +66,7 @@ class TestSerializer(unittest.TestCase):
         sim.add_clock(1/clk)
 
         def process():
-            data = 0xAABBCCDD
+            data = 0xDDCCBBAA
             yield m.w_data.eq(data)
             yield m.w_en.eq(1)
             yield m.r_en.eq(1)
@@ -74,7 +74,7 @@ class TestSerializer(unittest.TestCase):
             for i in range(10):
                 for j in range(4):
                     yield
-                    shift = 24 - (j*8)
+                    shift = (j*8)
                     mask = (0xff << shift)
                     expected_r_data = (data & mask) >> shift
                     self.assertEqual((yield m.r_data), expected_r_data)
