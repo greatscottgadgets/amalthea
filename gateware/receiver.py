@@ -19,6 +19,8 @@ from luna.gateware.usb.usb2.request  import USBRequestHandler
 
 from radio                           import IQReceiver, RadioSPI
 
+from fmdemod                         import FMDemod
+
 
 VENDOR_ID  = 0x16d0
 PRODUCT_ID = 0x0f3b
@@ -188,10 +190,22 @@ class Receiver(Elaboratable):
         m.d.comb += iq_rx.rxd.eq(radio.rxd24)
         m.submodules += DomainRenamer("radio")(iq_rx)
 
+        # Create FM demod
+        fmdemod = FMDemod(14)
+        m.d.comb += [
+            fmdemod.input.i.eq(iq_rx.i_sample),
+            fmdemod.input.q.eq(iq_rx.q_sample),
+        ]
+        m.submodules += [
+            DomainRenamer("radio")(EnableInserter(iq_rx.sample_valid)(fmdemod)),
+        ]
+
         iq_sample = Cat(
             # 13-bit samples, padded to 16-bit each.
             iq_rx.i_sample[1:] << 3,
             iq_rx.q_sample[1:] << 3,
+            fmdemod.output.shift_left(2),
+            Const(0, 16),
         )
         assert (len(iq_sample) % 8) == 0
 
