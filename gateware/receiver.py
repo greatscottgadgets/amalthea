@@ -190,83 +190,72 @@ class Receiver(Elaboratable):
             usb.full_speed_only  .eq(1 if os.getenv('LUNA_FULL_ONLY') else 0),
         ]
 
-        # Create radio clock domain
-        m.domains.radio = ClockDomain()
-        m.d.comb += [
-            ClockSignal("radio").eq(radio.rxclk),
-            ResetSignal("radio").eq(ResetSignal()),
-        ]
+        ## Create radio clock domain
+        #m.domains.radio = ClockDomain()
+        #m.d.comb += [
+        #    ClockSignal("radio").eq(radio.rxclk),
+        #    ResetSignal("radio").eq(ResetSignal()),
+        #]
 
-        # Get IQ samples & serialize them to bytes ready for USB.
-        iq_rx = IQReceiver()
-        ser = Serializer(w_width=32, r_width=8)
-        m.submodules += [
-            DomainRenamer("radio")(iq_rx),
-            DomainRenamer("radio")(ser),
-        ]
+        ## Get IQ samples & serialize them to bytes ready for USB.
+        #iq_rx = IQReceiver()
+        #ser = Serializer(w_width=32, r_width=8)
+        #m.submodules += [
+        #    DomainRenamer("radio")(iq_rx),
+        #    DomainRenamer("radio")(ser),
+        #]
 
-        iq_sample = Cat(
-            # 13-bit samples, swapped to little endian & padded to 16-bit each.
-            iq_rx.i_sample[1:] << 3,
-            iq_rx.q_sample[1:] << 3,
-        )
-        m.d.comb += [
-            iq_rx.rxd  .eq(radio.rxd24),
-            ser.w_data .eq(iq_sample),
-            ser.w_en   .eq(iq_rx.sample_valid),
-        ]
+        #iq_sample = Cat(
+        #    # 13-bit samples, swapped to little endian & padded to 16-bit each.
+        #    iq_rx.i_sample[1:] << 3,
+        #    iq_rx.q_sample[1:] << 3,
+        #)
+        #m.d.comb += [
+        #    iq_rx.rxd  .eq(radio.rxd24),
+        #    ser.w_data .eq(iq_sample),
+        #    ser.w_en   .eq(iq_rx.sample_valid),
+        #]
 
-        fifo  = AsyncFIFO(width=8, depth=2048, r_domain="usb", w_domain="radio")
+        #fifo  = AsyncFIFO(width=8, depth=2048, r_domain="usb", w_domain="radio")
+        #m.submodules += fifo
+        #m.d.comb += [
+        #    ser.r_en                   .eq(fifo.w_rdy),
+        #    fifo.w_en                  .eq(ser.r_rdy),
+        #    fifo.w_data                .eq(ser.r_data),
+        #    fifo.r_en                  .eq(stream_ep.stream.ready),
+        #    stream_ep.stream.valid     .eq(fifo.r_rdy),
+        #    stream_ep.stream.payload   .eq(fifo.r_data),
+        #]
+
+        io0 = platform.request("io", 0, dir="i")
+        io1 = platform.request("io", 1, dir="i")
+        samples = Signal(8)
+        samples_r = Signal(8)
+
+        data_count = Signal(2)
+        m.d.sync += [
+            data_count.eq(data_count+1),
+            samples.eq(Cat(io1, io0, samples[:-2])),
+        ]
+        m.d.sync += [
+            samples_r.eq(samples),
+        ]
+        fifo  = AsyncFIFO(width=8, depth=2048, r_domain="usb", w_domain="sync")
         m.submodules += fifo
         m.d.comb += [
-            ser.r_en                   .eq(fifo.w_rdy),
-            fifo.w_en                  .eq(ser.r_rdy),
-            fifo.w_data                .eq(ser.r_data),
-            fifo.r_en                  .eq(stream_ep.stream.ready),
-            stream_ep.stream.valid     .eq(fifo.r_rdy),
-            stream_ep.stream.payload   .eq(fifo.r_data),
+            fifo.w_en                .eq(data_count == 0),
+            fifo.w_data              .eq(samples),
+            fifo.r_en                .eq(stream_ep.stream.ready),
+            stream_ep.stream.valid   .eq(fifo.r_rdy),
+            stream_ep.stream.payload .eq(fifo.r_data),
         ]
 
         led0 = platform.request("led", 0)
-        m.d.radio += led0.eq(iq_rx.sample_valid)
+        m.d.sync += led0.eq(samples[7])
         led1 = platform.request("led", 1)
         m.d.usb += led1.eq(stream_ep.stream.valid)
         led2 = platform.request("led", 2)
-        m.d.radio += led2.eq(fifo.w_en)
-
-        tx_start_delay = Signal(26)
-        m.d.radio += tx_start_delay.eq(tx_start_delay+1)
-
-        tx_shift_counter = Signal(range(17))
-        tx_shift_reg = Signal(32)
-        tx_value = Signal(13)
-        with m.If(tx_start_delay[-1]):
-            m.d.radio += tx_start_delay.eq(tx_start_delay)
-            with m.If(tx_shift_counter == 0):
-                m.d.radio += [
-                    tx_shift_counter.eq(15),
-                    tx_shift_reg.eq(Cat(0, tx_value,   Const(0b01, 2),
-                                        0, Const(0, 13),   Const(0b10, 2))),
-                    tx_value.eq(tx_value+1),
-                ],
-            with m.Else():
-                m.d.radio += [
-                    tx_shift_reg.eq(tx_shift_reg << 2),
-                    tx_shift_counter.eq(tx_shift_counter - 1),
-                ]
-
-        txd = Signal(2)
-        m.d.comb += [
-            radio.txclk.eq(ClockSignal("radio")),
-            txd.eq(tx_shift_reg[-2:]),
-        ]
-        m.submodules += Instance("ODDRX1F",
-            i_D0=txd[1],
-            i_D1=txd[0],
-            i_SCLK=ClockSignal("radio"),
-            i_RST=ResetSignal(),
-            o_Q=radio.txd,
-        )
+        m.d.sync += led2.eq(fifo.w_en)
 
         return m
 

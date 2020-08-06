@@ -24,7 +24,7 @@ TRANSFER_QUEUE_DEPTH = 16
 
 class AmaltheaSource(gr.sync_block):
     BLOCK_NAME='Amalthea Source'
-    OUTPUT_TYPE=np.int16
+    OUTPUT_TYPE=np.dtype('u1')
 
     def _transfer_completed(self, transfer: usb1.USBTransfer):
 

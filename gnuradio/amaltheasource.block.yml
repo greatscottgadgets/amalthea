@@ -23,7 +23,7 @@ templates:
 
 outputs:
 - domain: stream
-  dtype: short
+  dtype: byte
   multiplicity: 1
 
 file_format: 1
