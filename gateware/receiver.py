@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
 # pylint: disable=no-member
-#
-# This file is part of LUNA.
-#
 
 import os
 import sys
@@ -100,11 +97,8 @@ class RadioSPIRequestHandler(USBRequestHandler):
                 return m
 
 
-class USBInSpeedTestDevice(Elaboratable):
-    """ Simple device that sends data to the host as fast as hardware can.
-
-    This is paired with the python code below to evaluate LUNA throughput.
-    """
+class Receiver(Elaboratable):
+    """ Amalthea receiver demo. """
 
     def create_descriptors(self):
         """ Create the descriptors we want to use for our device. """
@@ -277,8 +271,8 @@ class USBInSpeedTestDevice(Elaboratable):
         return m
 
 
-def run_speed_test():
-    """ Runs a simple speed test, and reports throughput. """
+def run():
+    """ Receive samples to a file. """
 
     total_data_exchanged = 0
     failed_out = False
@@ -292,7 +286,7 @@ def run_speed_test():
         6: "sent more data than expected."
     }
 
-    f = open('pipe', 'wb')
+    f = open('data.cs16', 'wb')
 
     def _should_terminate():
         """ Returns true iff our test should terminate. """
@@ -409,13 +403,13 @@ def run_speed_test():
 
 
 if __name__ == "__main__":
-    device = top_level_cli(USBInSpeedTestDevice)
+    device = top_level_cli(Receiver)
 
     logging.info("Giving the device time to connect...")
     time.sleep(5)
 
     if device is not None:
-        logging.info(f"Starting bulk in speed test.")
-        run_speed_test()
+        logging.info(f"Starting receive.")
+        run()
 
 
