@@ -5,12 +5,11 @@ import os
 import sys
 import logging
 import time
-
 import usb1
 
 from nmigen                          import *
 from nmigen.lib.fifo                 import AsyncFIFO
-from nmigen.asserts                  import Past
+
 from usb_protocol.types              import USBRequestType
 from usb_protocol.emitters           import DeviceDescriptorCollection
 
@@ -19,7 +18,6 @@ from luna.usb2                       import *
 from luna.gateware.usb.usb2.request  import USBRequestHandler
 
 from radio                           import IQReceiver, RadioSPI
-from util                            import Serializer
 
 
 VENDOR_ID  = 0x16d0
@@ -139,9 +137,6 @@ class Receiver(Elaboratable):
     def elaborate(self, platform):
         m = Module()
 
-        radio = platform.request("radio")
-        m.d.comb += radio.rst.eq(0)
-
         # Generate our domain clocks/resets.
         m.submodules.car = platform.clock_domain_generator()
 
@@ -157,6 +152,10 @@ class Receiver(Elaboratable):
         handler = DomainRenamer("usb")(RadioSPIRequestHandler())
         control_ep.add_request_handler(handler)
 
+        radio = platform.request("radio")
+        m.d.comb += radio.rst.eq(0)
+
+        # Setup the radio SPI interface.
         radio_spi = DomainRenamer("usb")(RadioSPI(clk_freq=60e6))
         m.submodules += radio_spi
 
@@ -177,8 +176,28 @@ class Receiver(Elaboratable):
             radio_spi.write_value  .eq(handler.spi_write_value),
         ]
 
+        # Create radio clock domain
+        m.domains.radio = ClockDomain()
+        m.d.comb += [
+            ClockSignal("radio").eq(radio.rxclk),
+            ResetSignal("radio").eq(ResetSignal()),
+        ]
+
+        # Get IQ samples.
+        iq_rx = IQReceiver()
+        m.d.comb += iq_rx.rxd.eq(radio.rxd24)
+        m.submodules += DomainRenamer("radio")(iq_rx)
+
+        iq_sample = Cat(
+            # 13-bit samples, padded to 16-bit each.
+            iq_rx.i_sample[1:] << 3,
+            iq_rx.q_sample[1:] << 3,
+        )
+        assert (len(iq_sample) % 8) == 0
+
         # Add a stream endpoint to our device.
-        stream_ep = USBStreamInEndpoint(
+        stream_ep = USBMultibyteStreamInEndpoint(
+            byte_width=int(len(iq_sample)/8),
             endpoint_number=BULK_ENDPOINT_NUMBER,
             max_packet_size=MAX_BULK_PACKET_SIZE
         )
@@ -190,49 +209,25 @@ class Receiver(Elaboratable):
             usb.full_speed_only  .eq(1 if os.getenv('LUNA_FULL_ONLY') else 0),
         ]
 
-        # Create radio clock domain
-        m.domains.radio = ClockDomain()
-        m.d.comb += [
-            ClockSignal("radio").eq(radio.rxclk),
-            ResetSignal("radio").eq(ResetSignal()),
-        ]
-
-        # Get IQ samples & serialize them to bytes ready for USB.
-        iq_rx = IQReceiver()
-        ser = Serializer(w_width=32, r_width=8)
-        m.submodules += [
-            DomainRenamer("radio")(iq_rx),
-            DomainRenamer("radio")(ser),
-        ]
-
-        iq_sample = Cat(
-            # 13-bit samples, swapped to little endian & padded to 16-bit each.
-            iq_rx.i_sample[1:] << 3,
-            iq_rx.q_sample[1:] << 3,
-        )
-        m.d.comb += [
-            iq_rx.rxd  .eq(radio.rxd24),
-            ser.w_data .eq(iq_sample),
-            ser.w_en   .eq(iq_rx.sample_valid),
-        ]
-
-        fifo  = AsyncFIFO(width=8, depth=2048, r_domain="usb", w_domain="radio")
+        # Connect up the IQ receiver to the USB stream, via a small FIFO.
+        fifo  = AsyncFIFO(width=len(iq_sample), depth=64, r_domain="usb", w_domain="radio")
         m.submodules += fifo
         m.d.comb += [
-            ser.r_en                   .eq(fifo.w_rdy),
-            fifo.w_en                  .eq(ser.r_rdy),
-            fifo.w_data                .eq(ser.r_data),
+            fifo.w_en                  .eq(iq_rx.sample_valid),
+            fifo.w_data                .eq(iq_sample),
             fifo.r_en                  .eq(stream_ep.stream.ready),
             stream_ep.stream.valid     .eq(fifo.r_rdy),
             stream_ep.stream.payload   .eq(fifo.r_data),
+            stream_ep.stream.last      .eq(0),
         ]
 
+        # Debug LEDs.
         led0 = platform.request("led", 0)
         m.d.radio += led0.eq(iq_rx.sample_valid)
         led1 = platform.request("led", 1)
         m.d.usb += led1.eq(stream_ep.stream.valid)
         led2 = platform.request("led", 2)
-        m.d.radio += led2.eq(fifo.w_en)
+        m.d.radio += led2.eq(fifo.w_rdy)
 
         tx_start_delay = Signal(26)
         m.d.radio += tx_start_delay.eq(tx_start_delay+1)
