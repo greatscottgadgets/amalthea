@@ -16,10 +16,10 @@ class Radio(Elaboratable):
         self.rst = Signal()
         self.irq = Signal()
 
-        self.sclk = Signal()
+        self.clk  = Signal()
         self.sel  = Signal()
-        self.mosi = Signal()
-        self.miso = Signal()
+        self.copi = Signal()
+        self.cipo = Signal()
 
     def elaborate(self, platform):
         m = Module()
@@ -57,9 +57,9 @@ class RadioSPI(Elaboratable):
         self.read_value  = Signal(8)
 
         self.sel  = Signal()
-        self.sclk = Signal()
-        self.mosi = Signal()
-        self.miso = Signal()
+        self.clk  = Signal()
+        self.copi = Signal()
+        self.cipo = Signal()
 
         self._clk_freq = clk_freq
 
@@ -85,7 +85,7 @@ class RadioSPI(Elaboratable):
         assert (self._clk_freq / 2) % SPI_FREQ == 0.0
         CLKS_PER_HALFBIT = int(self._clk_freq // (SPI_FREQ * 2))
         assert CLKS_PER_HALFBIT > 0
-        sclk_counter = Signal(range(CLKS_PER_HALFBIT))
+        clk_counter = Signal(range(CLKS_PER_HALFBIT))
 
         # Shift register for 4.2.3 "Single Access Mode" transaction.
         # (first bit is shifted immediately on start pulse, so -1 here)
@@ -101,26 +101,26 @@ class RadioSPI(Elaboratable):
                     m.d.sync += [
                         data.eq(Cat(self.write_value, self.address, 0)),
                         self.sel.eq(1),
-                        self.sclk.eq(0),
-                        self.mosi.eq(self.write),
+                        self.clk.eq(0),
+                        self.copi.eq(self.write),
                         bits_remaining.eq(8),
                         bytes_remaining.eq(2),
                     ]
                     self.enter_delay_state(m, "SEL_TO_SCLK")
 
             with m.State("SHIFT"):
-                m.d.sync += sclk_counter.eq(sclk_counter - 1)
+                m.d.sync += clk_counter.eq(clk_counter - 1)
 
-                with m.If(sclk_counter == 0):
-                    m.d.sync += self.sclk.eq(~self.sclk)
+                with m.If(clk_counter == 0):
+                    m.d.sync += self.clk.eq(~self.clk)
 
-                    with m.If(self.sclk): # Rising edge, shift some data.
-                        m.d.sync += self.mosi.eq(data[-1])
+                    with m.If(self.clk): # Rising edge, shift some data.
+                        m.d.sync += self.copi.eq(data[-1])
                         m.d.sync += data.eq(Cat(0, data[:-1]))
                         m.d.sync += bits_remaining.eq(bits_remaining - 1)
-                        m.d.sync += self.read_value.eq(Cat(self.miso, self.read_value[:-1]))
+                        m.d.sync += self.read_value.eq(Cat(self.cipo, self.read_value[:-1]))
 
-                    m.d.sync += sclk_counter.eq(CLKS_PER_HALFBIT-1)
+                    m.d.sync += clk_counter.eq(CLKS_PER_HALFBIT-1)
 
                 with m.If(bits_remaining == 0):
                     with m.If(bytes_remaining == 0):

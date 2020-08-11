@@ -163,11 +163,11 @@ class Receiver(Elaboratable):
         m.d.comb += [
             # Output pins
             radio.sel              .eq(radio_spi.sel),
-            radio.sclk             .eq(radio_spi.sclk),
-            radio.mosi             .eq(radio_spi.mosi),
+            radio.clk              .eq(radio_spi.clk),
+            radio.copi             .eq(radio_spi.copi),
 
             # Input pins
-            radio_spi.miso         .eq(radio.miso),
+            radio_spi.cipo         .eq(radio.cipo),
 
             # Vendor request handler connections
             radio_spi.start        .eq(handler.spi_start),
