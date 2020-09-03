@@ -14,6 +14,7 @@ class FMDemod(Elaboratable):
         self._iterations = iterations
         self.input   = IQ(sample_depth)
         self.output  = Signal(signed(sample_depth))
+        self.ampl    = Signal(sample_depth)
         self._sample_depth = sample_depth
 
         self.stages = [IQ(self._sample_depth)             for i in range(self._iterations)]
@@ -70,10 +71,29 @@ class FMDemod(Elaboratable):
                     phases[i+1].eq(phases[i] + cordic_angles[i]),
                 ]
 
+        def divide(sig, divisor, bits=16):
+            width = len(sig)
+
+            # Calculate the equivalent multiplier (in ~fixed-point).
+            multiplier_fp = round(2**bits / divisor)
+
+            # Multiply, then shift back down.
+            result = (sig * multiplier_fp).shift_right(bits)
+
+            # and return the result truncated to the original width.
+            return result[:width]
+
+        # After the sample has been rotated fully the imaginary part is ~0, so we can take the real part as the vector magnitude.
+        # The CORDIC algorithm applies some gain, so we divide that back out here.
+        # TODO: calculate actual CORDIC gain based on stage count
+        cordic_gain = 1.647
+        ampl = divide(stages[-1].i.as_unsigned(), cordic_gain)
+
         prev_phase = Signal(signed(self._sample_depth))
         m.d.sync += [
             prev_phase.eq(phases[-1]),
             self.output.eq(phases[-1] - prev_phase),
+            self.ampl.eq(ampl),
         ]
 
         return m

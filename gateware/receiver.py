@@ -191,10 +191,10 @@ class Receiver(Elaboratable):
         m.submodules += DomainRenamer("radio")(iq_rx)
 
         # Create FM demod
-        fmdemod = FMDemod(14)
+        fmdemod = FMDemod(16)
         m.d.comb += [
-            fmdemod.input.i.eq(iq_rx.i_sample),
-            fmdemod.input.q.eq(iq_rx.q_sample),
+            fmdemod.input.i.eq(iq_rx.i_sample.shift_right(1)),
+            fmdemod.input.q.eq(iq_rx.q_sample.shift_right(1)),
         ]
         m.submodules += [
             DomainRenamer("radio")(EnableInserter(iq_rx.sample_valid)(fmdemod)),
@@ -204,8 +204,8 @@ class Receiver(Elaboratable):
             # 13-bit samples, padded to 16-bit each.
             iq_rx.i_sample[1:] << 3,
             iq_rx.q_sample[1:] << 3,
-            fmdemod.output.shift_left(2),
-            Const(0, 16),
+            fmdemod.output,
+            fmdemod.ampl.shift_left(3)[:16],
         )
         assert (len(iq_sample) % 8) == 0
 
