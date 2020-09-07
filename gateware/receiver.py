@@ -19,7 +19,7 @@ from luna.gateware.usb.usb2.request  import USBRequestHandler
 
 from radio                           import IQReceiver, RadioSPI
 
-from fmdemod                         import FMDemod
+from demod                           import CORDICDemod
 
 
 VENDOR_ID  = 0x16d0
@@ -191,21 +191,21 @@ class Receiver(Elaboratable):
         m.submodules += DomainRenamer("radio")(iq_rx)
 
         # Create FM demod
-        fmdemod = FMDemod(16)
+        demod = CORDICDemod(16)
         m.d.comb += [
-            fmdemod.input.i.eq(iq_rx.i_sample.shift_right(1)),
-            fmdemod.input.q.eq(iq_rx.q_sample.shift_right(1)),
+            demod.input.i.eq(iq_rx.i_sample.shift_right(1)),
+            demod.input.q.eq(iq_rx.q_sample.shift_right(1)),
         ]
         m.submodules += [
-            DomainRenamer("radio")(EnableInserter(iq_rx.sample_valid)(fmdemod)),
+            DomainRenamer("radio")(EnableInserter(iq_rx.sample_valid)(demod)),
         ]
 
         iq_sample = Cat(
             # 13-bit samples, padded to 16-bit each.
             iq_rx.i_sample[1:] << 3,
             iq_rx.q_sample[1:] << 3,
-            fmdemod.output,
-            fmdemod.ampl.shift_left(3)[:16],
+            demod.frequency,
+            demod.amplitude.shift_left(3)[:16],
         )
         assert (len(iq_sample) % 8) == 0
 
@@ -417,8 +417,8 @@ if __name__ == "__main__":
     logging.info("Giving the device time to connect...")
     time.sleep(5)
 
-    if device is not None:
-        logging.info(f"Starting receive.")
-        run()
+#    if device is not None:
+#        logging.info(f"Starting receive.")
+#        run()
 
 

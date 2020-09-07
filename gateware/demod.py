@@ -9,12 +9,12 @@ class IQ:
         self.i = Signal(signed(sample_depth))
         self.q = Signal(signed(sample_depth))
 
-class FMDemod(Elaboratable):
+class CORDICDemod(Elaboratable):
     def __init__(self, sample_depth, iterations=9):
         self._iterations = iterations
-        self.input   = IQ(sample_depth)
-        self.output  = Signal(signed(sample_depth))
-        self.ampl    = Signal(sample_depth)
+        self.input         = IQ(sample_depth)
+        self.amplitude     = Signal(sample_depth)
+        self.frequency     = Signal(signed(sample_depth))
         self._sample_depth = sample_depth
 
         self.stages = [IQ(self._sample_depth)             for i in range(self._iterations)]
@@ -91,9 +91,9 @@ class FMDemod(Elaboratable):
 
         prev_phase = Signal(signed(self._sample_depth))
         m.d.sync += [
-            prev_phase.eq(phases[-1]),
-            self.output.eq(phases[-1] - prev_phase),
-            self.ampl.eq(ampl),
+            prev_phase    .eq(phases[-1]),
+            self.amplitude.eq(ampl),
+            self.frequency.eq(phases[-1] - prev_phase),
         ]
 
         return m
@@ -104,19 +104,19 @@ if __name__ == "__main__":
 
     input_i = Signal(signed(16))
     input_q = Signal(signed(16))
-    output  = Signal(signed(16))
-    fmdemod = FMDemod(16)
-    m.submodules += fmdemod
+    freq    = Signal(signed(16))
+    demod   = CORDICDemod(16)
+    m.submodules += demod
 
     blink = Signal()
     m.d.sync += blink.eq(blink + 1)
 
     m.d.comb += [
-        fmdemod.input.i.eq(input_i),
-        fmdemod.input.q.eq(input_q),
-        output .eq(fmdemod.output),
+        demod.input.i.eq(input_i),
+        demod.input.q.eq(input_q),
+        freq.eq(demod.frequency),
     ]
 
-    output = cxxrtl.convert(m, ports=(input_i, input_q, output, blink))
+    output = cxxrtl.convert(m, ports=(input_i, input_q, freq, blink))
     with open('lib/rtl.cpp', 'w') as f:
         f.write(output)
