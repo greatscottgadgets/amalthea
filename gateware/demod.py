@@ -15,6 +15,7 @@ class CORDICDemod(Elaboratable):
         self.input         = IQ(sample_depth)
         self.amplitude     = Signal(sample_depth)
         self.frequency     = Signal(signed(sample_depth))
+        self.phase         = Signal(signed(sample_depth))
         self._sample_depth = sample_depth
 
         self.stages = [IQ(self._sample_depth)             for i in range(self._iterations)]
@@ -94,6 +95,7 @@ class CORDICDemod(Elaboratable):
             prev_phase    .eq(phases[-1]),
             self.amplitude.eq(ampl),
             self.frequency.eq(phases[-1] - prev_phase),
+            self.phase    .eq(phases[-1]),
         ]
 
         return m
