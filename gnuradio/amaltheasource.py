@@ -85,6 +85,7 @@ class AmaltheaSource(gr.sync_block):
         for transfer in self.active_transfers:
             transfer.submit()
 
+        self.start_rx()
         return True
 
     def start_rx(self):
