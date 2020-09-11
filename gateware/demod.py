@@ -21,10 +21,16 @@ class CORDICDemod(Elaboratable):
         self.stages = [IQ(self._sample_depth)             for i in range(self._iterations)]
         self.phases = [Signal(signed(self._sample_depth)) for i in range(self._iterations)]
 
-    def cordic_angle(self, l):
-        k = pow(2, -l)
-        phase_rads = cmath.phase(complex(1, k))
-        return round(phase_rads * pow(2, self._sample_depth-1) / math.pi)
+    def cordic_table(self):
+        cordic_angles = []
+        cordic_gain = 1.0
+        for l in range(self._iterations):
+            k = pow(2, -l)
+            vec = complex(1, k)
+            phase_rads = cmath.phase(vec)
+            cordic_angles.append(round(phase_rads * pow(2, self._sample_depth-1) / math.pi))
+            cordic_gain *= abs(vec)
+        return cordic_angles, cordic_gain
 
     def elaborate(self, platform):
         m = Module()
@@ -32,8 +38,7 @@ class CORDICDemod(Elaboratable):
         stages = self.stages
         phases = self.phases
 
-        cordic_angles = [self.cordic_angle(i)        for i in range(self._iterations)]
-        #print(cordic_angles)
+        cordic_angles, cordic_gain = self.cordic_table()
 
         # First stage, special case for 90 degrees
         negative_phase = self.input.q[-1]
@@ -86,8 +91,6 @@ class CORDICDemod(Elaboratable):
 
         # After the sample has been rotated fully the imaginary part is ~0, so we can take the real part as the vector magnitude.
         # The CORDIC algorithm applies some gain, so we divide that back out here.
-        # TODO: calculate actual CORDIC gain based on stage count
-        cordic_gain = 1.647
         ampl = divide(stages[-1].i.as_unsigned(), cordic_gain)
 
         prev_phase = Signal(signed(self._sample_depth))
