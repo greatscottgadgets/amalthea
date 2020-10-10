@@ -97,8 +97,8 @@ class RadioSPIRequestHandler(USBRequestHandler):
                 return m
 
 
-class Receiver(Elaboratable):
-    """ Amalthea receiver demo. """
+class Device(Elaboratable):
+    """ Amalthea device. """
 
     def create_descriptors(self):
         """ Create the descriptors we want to use for our device. """
@@ -412,7 +412,7 @@ def run():
 
 
 if __name__ == "__main__":
-    device = top_level_cli(Receiver)
+    device = top_level_cli(Device)
 
     logging.info("Giving the device time to connect...")
     time.sleep(5)
