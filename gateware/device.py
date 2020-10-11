@@ -17,9 +17,9 @@ from luna                            import top_level_cli
 from luna.usb2                       import *
 from luna.gateware.usb.usb2.request  import USBRequestHandler
 
-from radio                           import IQReceiver, RadioSPI
+from .radio                           import IQReceiver, RadioSPI
 
-from demod                           import CORDICDemod
+from .demod                           import CORDICDemod
 
 
 VENDOR_ID  = 0x16d0

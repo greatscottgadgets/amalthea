@@ -1,0 +1,10 @@
+id: hybridsdr
+label: HybridSDR
+color: "#81b35d"
+
+multiple_connections_per_input: false
+multiple_connections_per_output: false
+
+templates:
+-   type: [hybridsdr, hybridsdr]
+    connect: self.hybridsdr_graph.connect(self.${ source.parent_block.name }.get_unique_id(), ${ source.key }, self.${ sink.parent_block.name }.get_unique_id(), ${ sink.key }, False)

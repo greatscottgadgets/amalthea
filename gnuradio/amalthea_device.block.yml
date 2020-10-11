@@ -1,0 +1,14 @@
+id: amalthea_device
+label: Amalthea device
+flags: [ show_id, python ]
+category: '[Amalthea]'
+
+templates:
+  imports: |-
+      from amalthea.gateware.device import Device as AmaltheaDevice
+  var_make: |-
+      self.amalthea_device = AmaltheaDevice
+
+value: ${ 'Amalthea device' }
+
+file_format: 1
