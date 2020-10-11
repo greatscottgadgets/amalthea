@@ -9,6 +9,8 @@ from math import ceil
 from operator import attrgetter
 import unittest
 
+from .stream import IQStream
+
 class Radio(Elaboratable):
     """ AT86RF215 radio
     """
@@ -179,16 +181,22 @@ Q_SYNC = 0b01
 
 class IQReceiver(Elaboratable):
     def __init__(self):
-        self.rxd          = Signal()
-        self.i_sample     = Signal(signed(14))
-        self.q_sample     = Signal(signed(14))
-        self.sample_valid = Signal()
+        self.rxd    = Signal()
+        self.output = IQStream()
 
     def elaborate(self, platform):
         m = Module()
 
         rxd_delay = Signal()
         data      = Signal(2)
+        i_sample  = Signal(signed(14))
+        q_sample  = Signal(signed(14))
+        m.d.comb += [
+            self.output.payload.eq(
+                Cat(i_sample[1:], q_sample[1:]),
+            ),
+            self.output.last.eq(0),
+        ]
 
         m.submodules += [
             Instance("DELAYG",
@@ -206,7 +214,7 @@ class IQReceiver(Elaboratable):
         ]
 
         data_count = Signal(3)
-        m.d.sync += self.sample_valid.eq(0)
+        m.d.sync += self.output.valid.eq(0)
         with m.FSM() as fsm:
             with m.State("I_SYNC"):
                 with m.If(data == I_SYNC):
@@ -220,7 +228,7 @@ class IQReceiver(Elaboratable):
                     m.next = "Q_SYNC"
 
                 m.d.sync += [
-                    self.i_sample.eq(Cat(data, self.i_sample)),
+                    i_sample.eq(Cat(data, i_sample)),
                     data_count.eq(data_count + 1)
                 ]
 
@@ -235,11 +243,11 @@ class IQReceiver(Elaboratable):
 
             with m.State("Q_DATA"):
                 with m.If(data_count == 6):
-                    m.d.sync += self.sample_valid.eq(1)
+                    m.d.sync += self.output.valid.eq(1)
                     m.next = "I_SYNC"
 
                 m.d.sync += [
-                    self.q_sample.eq(Cat(data, self.q_sample)),
+                    q_sample.eq(Cat(data, q_sample)),
                     data_count.eq(data_count + 1)
                 ]
 

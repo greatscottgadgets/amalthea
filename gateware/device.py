@@ -185,17 +185,17 @@ class Device(Elaboratable):
         # Create FM demod
         demod = CORDICDemod(16)
         m.d.comb += [
-            demod.input.i.eq(iq_rx.i_sample.shift_right(1)),
-            demod.input.q.eq(iq_rx.q_sample.shift_right(1)),
+            demod.input.i.eq(iq_rx.output.i),
+            demod.input.q.eq(iq_rx.output.q),
         ]
         m.submodules += [
-            DomainRenamer("radio")(EnableInserter(iq_rx.sample_valid)(demod)),
+            DomainRenamer("radio")(EnableInserter(iq_rx.output.valid)(demod)),
         ]
 
         iq_sample = Cat(
             # 13-bit samples, padded to 16-bit each.
-            iq_rx.i_sample[1:] << 3,
-            iq_rx.q_sample[1:] << 3,
+            iq_rx.output.i << 3,
+            iq_rx.output.q << 3,
             demod.frequency,
             demod.amplitude.shift_left(3)[:16],
         )
@@ -219,7 +219,7 @@ class Device(Elaboratable):
         fifo  = AsyncFIFO(width=len(iq_sample), depth=64, r_domain="usb", w_domain="radio")
         m.submodules += fifo
         m.d.comb += [
-            fifo.w_en                  .eq(iq_rx.sample_valid),
+            fifo.w_en                  .eq(iq_rx.output.valid),
             fifo.w_data                .eq(iq_sample),
             fifo.r_en                  .eq(stream_ep.stream.ready),
             stream_ep.stream.valid     .eq(fifo.r_rdy),
@@ -229,7 +229,7 @@ class Device(Elaboratable):
 
         # Debug LEDs.
         led0 = platform.request("led", 0)
-        m.d.radio += led0.eq(iq_rx.sample_valid)
+        m.d.radio += led0.eq(iq_rx.output.valid)
         led1 = platform.request("led", 1)
         m.d.usb += led1.eq(stream_ep.stream.valid)
         led2 = platform.request("led", 2)
