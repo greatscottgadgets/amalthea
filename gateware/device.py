@@ -235,39 +235,6 @@ class Device(Elaboratable):
         led2 = platform.request("led", 2)
         m.d.radio += led2.eq(fifo.w_rdy)
 
-        tx_start_delay = Signal(26)
-        m.d.radio += tx_start_delay.eq(tx_start_delay+1)
-
-        tx_shift_counter = Signal(range(17))
-        tx_shift_reg = Signal(32)
-        tx_value = Signal(13)
-        with m.If(tx_start_delay[-1]):
-            m.d.radio += tx_start_delay.eq(tx_start_delay)
-            with m.If(tx_shift_counter == 0):
-                m.d.radio += [
-                    tx_shift_counter.eq(15),
-                    tx_shift_reg.eq(Cat(0, tx_value,   Const(0b01, 2),
-                                        0, Const(0, 13),   Const(0b10, 2))),
-                    tx_value.eq(tx_value+1),
-                ],
-            with m.Else():
-                m.d.radio += [
-                    tx_shift_reg.eq(tx_shift_reg << 2),
-                    tx_shift_counter.eq(tx_shift_counter - 1),
-                ]
-
-        txd = Signal(2)
-        m.d.comb += [
-            radio.txclk.eq(ClockSignal("radio")),
-            txd.eq(tx_shift_reg[-2:]),
-        ]
-        m.submodules += Instance("ODDRX1F",
-            i_D0=txd[1],
-            i_D1=txd[0],
-            i_SCLK=ClockSignal("radio"),
-            i_RST=ResetSignal(),
-            o_Q=radio.txd,
-        )
 
         return m
 
