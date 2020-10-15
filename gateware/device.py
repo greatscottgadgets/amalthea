@@ -183,10 +183,9 @@ class Device(Elaboratable):
         m.submodules += DomainRenamer("radio")(iq_rx)
 
         # Create FM demod
-        demod = CORDICDemod(16)
+        demod = CORDICDemod(13)
         m.d.comb += [
-            demod.input.i.eq(iq_rx.output.i),
-            demod.input.q.eq(iq_rx.output.q),
+            demod.input.connect(iq_rx.output),
         ]
         m.submodules += [
             DomainRenamer("radio")(EnableInserter(iq_rx.output.valid)(demod)),
@@ -196,7 +195,7 @@ class Device(Elaboratable):
             # 13-bit samples, padded to 16-bit each.
             iq_rx.output.i << 3,
             iq_rx.output.q << 3,
-            demod.frequency,
+            demod.frequency << 3,
             demod.amplitude.shift_left(3)[:16],
         )
         assert (len(iq_sample) % 8) == 0

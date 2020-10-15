@@ -4,6 +4,9 @@ from nmigen.back import cxxrtl
 import cmath
 import math
 
+from .stream import IQStream
+
+
 class IQ:
     def __init__(self, sample_depth):
         self.i = Signal(signed(sample_depth))
@@ -12,7 +15,7 @@ class IQ:
 class CORDICDemod(Elaboratable):
     def __init__(self, sample_depth, iterations=9):
         self._iterations = iterations
-        self.input         = IQ(sample_depth)
+        self.input         = IQStream(sample_depth)
         self.amplitude     = Signal(sample_depth)
         self.frequency     = Signal(signed(sample_depth))
         self.phase         = Signal(signed(sample_depth))
