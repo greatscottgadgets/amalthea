@@ -18,7 +18,8 @@ class CORDICDemod(Elaboratable):
         self.phase         = Signal(signed(sample_depth))
         self._sample_depth = sample_depth
 
-        self.stages = [IQ(self._sample_depth)             for i in range(self._iterations)]
+        # Make the intermediate stages 1-bit wider to account for CORDIC gain.
+        self.stages = [IQ(self._sample_depth+1)             for i in range(self._iterations)]
         self.phases = [Signal(signed(self._sample_depth)) for i in range(self._iterations)]
 
     def cordic_table(self):
