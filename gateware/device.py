@@ -17,9 +17,9 @@ from luna                            import top_level_cli
 from luna.usb2                       import *
 from luna.gateware.usb.usb2.request  import USBRequestHandler
 
-from .radio                           import IQReceiver, RadioSPI
-
-from .demod                           import CORDICDemod
+from .radio                          import IQReceiver, RadioSPI
+from .demod                          import CORDICDemod
+from .stream                         import StreamCombiner
 
 
 VENDOR_ID  = 0x16d0
@@ -188,21 +188,30 @@ class Device(Elaboratable):
             demod.input.connect(iq_rx.output),
         ]
         m.submodules += [
-            DomainRenamer("radio")(EnableInserter(iq_rx.output.valid)(demod)),
+            DomainRenamer("radio")(demod),
         ]
 
-        iq_sample = Cat(
-            # 13-bit samples, padded to 16-bit each.
-            iq_rx.output.i << 3,
-            iq_rx.output.q << 3,
-            demod.frequency << 3,
-            demod.amplitude.shift_left(3)[:16],
+        combined = StreamCombiner(
+            streams=[
+                iq_rx.output,
+                demod.frequency,
+                demod.amplitude,
+            ],
+            domain="radio",
         )
-        assert (len(iq_sample) % 8) == 0
+        m.submodules += combined
+
+        payload = combined.output.payload
+        usb_data = Cat(
+            # Pad each 13-bit value to 16-bits for now.
+            payload.word_select(i, 13).shift_left(3) for i in range(4)
+        )
+        assert (len(usb_data) % 8) == 0, f"{len(usb_data)}"
+
 
         # Add a stream endpoint to our device.
         stream_ep = USBMultibyteStreamInEndpoint(
-            byte_width=int(len(iq_sample)/8),
+            byte_width=int(len(usb_data)/8),
             endpoint_number=BULK_ENDPOINT_NUMBER,
             max_packet_size=MAX_BULK_PACKET_SIZE
         )
@@ -215,11 +224,12 @@ class Device(Elaboratable):
         ]
 
         # Connect up the IQ receiver to the USB stream, via a small FIFO.
-        fifo  = AsyncFIFO(width=len(iq_sample), depth=64, r_domain="usb", w_domain="radio")
+        fifo  = AsyncFIFO(width=len(usb_data), depth=128, r_domain="usb", w_domain="radio")
         m.submodules += fifo
         m.d.comb += [
-            fifo.w_en                  .eq(iq_rx.output.valid),
-            fifo.w_data                .eq(iq_sample),
+            combined.output.ready      .eq(fifo.w_rdy),
+            fifo.w_en                  .eq(combined.output.valid),
+            fifo.w_data                .eq(usb_data),
             fifo.r_en                  .eq(stream_ep.stream.ready),
             stream_ep.stream.valid     .eq(fifo.r_rdy),
             stream_ep.stream.payload   .eq(fifo.r_data),

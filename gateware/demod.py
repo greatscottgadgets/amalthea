@@ -4,7 +4,7 @@ from nmigen.back import cxxrtl
 import cmath
 import math
 
-from .stream import IQStream
+from .stream import IQStream, SampleStream
 
 
 class IQ:
@@ -16,14 +16,10 @@ class CORDICDemod(Elaboratable):
     def __init__(self, sample_depth, iterations=9):
         self._iterations = iterations
         self.input         = IQStream(sample_depth)
-        self.amplitude     = Signal(sample_depth)
-        self.frequency     = Signal(signed(sample_depth))
-        self.phase         = Signal(signed(sample_depth))
+        self.amplitude     = SampleStream(sample_depth)
+        self.frequency     = SampleStream(sample_depth)
+        self.phase         = SampleStream(sample_depth)
         self._sample_depth = sample_depth
-
-        # Make the intermediate stages 1-bit wider to account for CORDIC gain.
-        self.stages = [IQ(self._sample_depth+1)             for i in range(self._iterations)]
-        self.phases = [Signal(signed(self._sample_depth)) for i in range(self._iterations)]
 
     def cordic_table(self):
         cordic_angles = []
@@ -39,8 +35,15 @@ class CORDICDemod(Elaboratable):
     def elaborate(self, platform):
         m = Module()
 
-        stages = self.stages
-        phases = self.phases
+
+        # Make the intermediate stages 1-bit wider to account for CORDIC gain.
+        stages = [IQ(self._sample_depth+1)           for i in range(self._iterations)]
+        phases = [Signal(signed(self._sample_depth)) for i in range(self._iterations)]
+        valid  = [Signal()                           for i in range(self._iterations)]
+
+        m.d.sync += valid[0].eq(self.input.valid)
+        for i in range(0, self._iterations-1):
+            m.d.sync += valid[i+1].eq(valid[i])
 
         cordic_angles, cordic_gain = self.cordic_table()
 
@@ -51,14 +54,14 @@ class CORDICDemod(Elaboratable):
             m.d.sync += [
                 stages[0].i.eq(-self.input.q),
                 stages[0].q.eq( self.input.i),
-                phases[0].eq( pow(2, self._sample_depth-2))
+                phases[0].eq(pow(2, self._sample_depth-2)),
             ]
         with m.Else():
             # Rotate -90 and set the initial phase estimate to +90
             m.d.sync += [
                 stages[0].i.eq( self.input.q),
                 stages[0].q.eq(-self.input.i),
-                phases[0].eq(-pow(2, self._sample_depth-2))
+                phases[0].eq(-pow(2, self._sample_depth-2)),
             ]
 
         # Remaining stages, rotate towards 1+0j by successively smaller angles
@@ -98,11 +101,17 @@ class CORDICDemod(Elaboratable):
         ampl = divide(stages[-1].i.as_unsigned(), cordic_gain)
 
         prev_phase = Signal(signed(self._sample_depth))
+        with m.If(valid[-1]):
+            m.d.sync += prev_phase.eq(phases[-1])
+
         m.d.sync += [
-            prev_phase    .eq(phases[-1]),
-            self.amplitude.eq(ampl),
-            self.frequency.eq(phases[-1] - prev_phase),
-            self.phase    .eq(phases[-1]),
+            self.amplitude.payload.eq(ampl),
+            self.frequency.payload.eq(phases[-1] - prev_phase),
+            self.phase    .payload.eq(phases[-1]),
+
+            self.amplitude.valid.eq(valid[-1]),
+            self.frequency.valid.eq(valid[-1]),
+            self.phase    .valid.eq(valid[-1]),
         ]
 
         return m
