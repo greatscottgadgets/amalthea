@@ -41,109 +41,89 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [420, 42]
+    coordinate: [362, 137]
     rotation: 0
     state: true
-- name: samp_rate
-  id: variable
-  parameters:
-    comment: ''
-    value: 4e6
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [184, 12]
-    rotation: 0
-    state: enabled
-- name: amalthea_source_0
-  id: amalthea_source
+- name: amalthea_demod_0
+  id: amalthea_demod
   parameters:
     affinity: ''
     alias: ''
     comment: ''
-    freq: 2450e6
     maxoutbuf: '0'
     minoutbuf: '0'
-    sample_rate: samp_rate
+    type: hybridsdr
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [145, 208]
+    coordinate: [395, 397]
     rotation: 0
     state: true
-- name: blocks_interleaved_short_to_complex_0
-  id: blocks_interleaved_short_to_complex
+- name: amalthea_rx_0
+  id: amalthea_rx
   parameters:
     affinity: ''
     alias: ''
     comment: ''
     maxoutbuf: '0'
     minoutbuf: '0'
-    swap: 'False'
-    vector_input: 'False'
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [614, 184]
+    coordinate: [111, 260]
     rotation: 0
-    state: enabled
-- name: blocks_keep_m_in_n_0
-  id: blocks_keep_m_in_n
+    state: true
+- name: blocks_null_sink_0_0
+  id: blocks_null_sink
   parameters:
     affinity: ''
     alias: ''
+    bus_structure_sink: '[[0,],]'
     comment: ''
-    m: '2'
-    maxoutbuf: '0'
-    minoutbuf: '0'
-    n: '4'
-    offset: '0'
-    type: short
+    num_inputs: '1'
+    type: float
+    vlen: '1'
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [402, 183]
+    coordinate: [705, 392]
     rotation: 0
     state: enabled
-- name: blocks_multiply_const_vxx_0
-  id: blocks_multiply_const_vxx
+- name: blocks_null_sink_0_0_0
+  id: blocks_null_sink
   parameters:
     affinity: ''
     alias: ''
+    bus_structure_sink: '[[0,],]'
     comment: ''
-    const: 1/32768.
-    maxoutbuf: '0'
-    minoutbuf: '0'
+    num_inputs: '1'
     type: complex
     vlen: '1'
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [894, 194]
+    coordinate: [701, 219]
     rotation: 0
     state: enabled
-- name: fosphor_qt_sink_c_0
-  id: fosphor_qt_sink_c
+- name: blocks_null_sink_0_0_1
+  id: blocks_null_sink
   parameters:
     affinity: ''
     alias: ''
+    bus_structure_sink: '[[0,],]'
     comment: ''
-    freq_center: '0'
-    freq_span: samp_rate
-    gui_hint: ''
-    maxoutbuf: '0'
-    minoutbuf: '0'
-    wintype: firdes.WIN_BLACKMAN_hARRIS
+    num_inputs: '1'
+    type: float
+    vlen: '1'
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1102, 167]
+    coordinate: [707, 340]
     rotation: 0
     state: enabled
 - name: import_0
@@ -159,26 +139,11 @@ blocks:
     coordinate: [804, 40]
     rotation: 0
     state: true
-- name: import_0_0
-  id: import
-  parameters:
-    alias: ''
-    comment: ''
-    imports: import time
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [939, 41]
-    rotation: 0
-    state: true
 - name: snippet_0
   id: snippet
   parameters:
     alias: ''
-    code: 'top_level_cli(self.amalthea_device)
-
-      time.sleep(8)'
+    code: top_level_cli(self.amalthea_device)
     comment: ''
     priority: ''
     section: main_after_init
@@ -191,10 +156,10 @@ blocks:
     state: true
 
 connections:
-- [amalthea_source_0, '0', blocks_keep_m_in_n_0, '0']
-- [blocks_interleaved_short_to_complex_0, '0', blocks_multiply_const_vxx_0, '0']
-- [blocks_keep_m_in_n_0, '0', blocks_interleaved_short_to_complex_0, '0']
-- [blocks_multiply_const_vxx_0, '0', fosphor_qt_sink_c_0, '0']
+- [amalthea_demod_0, '0', blocks_null_sink_0_0_1, '0']
+- [amalthea_demod_0, '1', blocks_null_sink_0_0, '0']
+- [amalthea_rx_0, '0', amalthea_demod_0, '0']
+- [amalthea_rx_0, '0', blocks_null_sink_0_0_0, '0']
 
 metadata:
   file_format: 1

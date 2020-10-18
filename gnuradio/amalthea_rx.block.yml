@@ -1,0 +1,16 @@
+id: amalthea_rx
+label: Amalthea RX
+category: '[Amalthea]'
+
+templates:
+  imports: |-
+      import amalthea
+  make: |-
+      self.amalthea_device.add_block("${id}", self.amalthea_device.get_rx())
+
+outputs:
+- domain: hybridsdr
+  dtype: complex
+  vlen: 1
+
+file_format: 1

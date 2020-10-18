@@ -3,8 +3,10 @@ label: HybridSDR
 color: "#81b35d"
 
 multiple_connections_per_input: false
-multiple_connections_per_output: false
+multiple_connections_per_output: true
 
 templates:
 -   type: [hybridsdr, hybridsdr]
-    connect: self.hybridsdr_graph.connect(self.${ source.parent_block.name }.get_unique_id(), ${ source.key }, self.${ sink.parent_block.name }.get_unique_id(), ${ sink.key }, False)
+    connect: self.amalthea_device.connect(("${ source.parent_block.name }", ${ source.key }), ("${ sink.parent_block.name }", ${ sink.key }))
+-   type: [hybridsdr, stream]
+    connect: self.amalthea_device.connect_usb(("${ source.parent_block.name }", ${ source.key }))

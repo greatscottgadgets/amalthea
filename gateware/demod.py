@@ -20,6 +20,7 @@ class CORDICDemod(Elaboratable):
         self.frequency     = SampleStream(sample_depth)
         self.phase         = SampleStream(sample_depth)
         self._sample_depth = sample_depth
+        self.outputs = [self.amplitude, self.frequency, self.phase]
 
     def cordic_table(self):
         cordic_angles = []

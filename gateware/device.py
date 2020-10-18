@@ -92,6 +92,33 @@ class RadioSPIRequestHandler(USBRequestHandler):
 class Device(Elaboratable):
     """ Amalthea device. """
 
+    def __init__(self):
+        self._rx = IQReceiver();
+        self._blocks = {}
+        self._usb_outputs = []
+        self._connections = []
+
+    def get_rx(self):
+        return self._rx
+
+    def add_block(self, block_id, block):
+        self._blocks[block_id] = block
+        return block
+
+    def connect(self, source, sink):
+        print(f"connect {source} {sink}")
+        source_id, source_output = source
+        sink_id, sink_input = sink
+
+        source_block = self._blocks[source_id]
+        sink_block   = self._blocks[sink_id]
+        self._connections.append(sink_block.input.connect(source_block.outputs[source_output]))
+
+    def connect_usb(self, source):
+        print(f"connect_usb {source}")
+        block_id, output_id = source
+        self._usb_outputs.append(self._blocks[block_id].outputs[output_id])
+
     def create_descriptors(self):
         """ Create the descriptors we want to use for our device. """
 
@@ -178,25 +205,15 @@ class Device(Elaboratable):
         ]
 
         # Get IQ samples.
-        iq_rx = IQReceiver()
+        iq_rx = self.get_rx()
         m.d.comb += iq_rx.rxd.eq(radio.rxd24)
-        m.submodules += DomainRenamer("radio")(iq_rx)
 
-        # Create FM demod
-        demod = CORDICDemod(13)
-        m.d.comb += [
-            demod.input.connect(iq_rx.output),
-        ]
-        m.submodules += [
-            DomainRenamer("radio")(demod),
-        ]
+        #
+        m.submodules += map(DomainRenamer("radio"), self._blocks.values())
+        m.d.comb += self._connections
 
         combined = StreamCombiner(
-            streams=[
-                iq_rx.output,
-                demod.frequency,
-                demod.amplitude,
-            ],
+            streams=self._usb_outputs,
             domain="radio",
         )
         m.submodules += combined
@@ -204,7 +221,7 @@ class Device(Elaboratable):
         payload = combined.output.payload
         usb_data = Cat(
             # Pad each 13-bit value to 16-bits for now.
-            payload.word_select(i, 13).shift_left(3) for i in range(4)
+            payload.word_select(i, 13).shift_left(3) for i in range(int(len(payload)/13))
         )
         assert (len(usb_data) % 8) == 0, f"{len(usb_data)}"
 
@@ -238,7 +255,7 @@ class Device(Elaboratable):
 
         # Debug LEDs.
         led0 = platform.request("led", 0)
-        m.d.radio += led0.eq(iq_rx.output.valid)
+        m.d.radio += led0.eq(iq_rx.outputs[0].valid)
         led1 = platform.request("led", 1)
         m.d.usb += led1.eq(stream_ep.stream.valid)
         led2 = platform.request("led", 2)

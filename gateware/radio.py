@@ -181,8 +181,9 @@ Q_SYNC = 0b01
 
 class IQReceiver(Elaboratable):
     def __init__(self):
-        self.rxd    = Signal()
+        self.rxd     = Signal()
         self.output = IQStream()
+        self.outputs = [self.output]
 
     def elaborate(self, platform):
         m = Module()

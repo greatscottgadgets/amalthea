@@ -7,7 +7,7 @@ templates:
   imports: |-
       from amalthea.gateware.device import Device as AmaltheaDevice
   var_make: |-
-      self.amalthea_device = AmaltheaDevice
+      self.amalthea_device = AmaltheaDevice()
 
 value: ${ 'Amalthea device' }
 
