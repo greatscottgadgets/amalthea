@@ -1,1 +1,6 @@
 __pycache__/
+.eggs/
+*.egg-info/
+
+amalthea/gateware/build/
+amalthea/gnuradio/example/*.py
