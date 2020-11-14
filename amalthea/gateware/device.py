@@ -112,7 +112,7 @@ class Device(Elaboratable):
 
         source_block = self._blocks[source_id]
         sink_block   = self._blocks[sink_id]
-        self._connections.append(sink_block.input.connect(source_block.outputs[source_output]))
+        self._connections.append(sink_block.input.stream_eq(source_block.outputs[source_output]))
 
     def connect_usb(self, source):
         print(f"connect_usb {source}")
