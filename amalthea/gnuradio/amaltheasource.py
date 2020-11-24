@@ -24,7 +24,7 @@ TRANSFER_QUEUE_DEPTH = 16
 
 class AmaltheaSource(gr.sync_block):
     BLOCK_NAME='Amalthea Source'
-    OUTPUT_TYPE=np.int16
+    OUTPUT_TYPE=np.float32
 
     def _transfer_completed(self, transfer: usb1.USBTransfer):
 
@@ -32,24 +32,25 @@ class AmaltheaSource(gr.sync_block):
 
         # If the transfer completed.
         if status in (usb1.TRANSFER_COMPLETED,):
-
-            self.buffer = np.append(self.buffer, np.frombuffer(transfer.getBuffer(), dtype=self.OUTPUT_TYPE))
+            buf = np.frombuffer(transfer.getBuffer(), dtype=np.int16)
+            self.buffer = np.append(self.buffer, buf.astype(float)/32768)
             transfer.submit()
 
         else:
             # TODO: handle errors
             failed_out = status
 
-    def __init__(self, sample_rate, freq):
+    def __init__(self, sample_rate, freq, output_count=1):
         gr.sync_block.__init__(
             self,
             name=self.BLOCK_NAME,
             in_sig=None,
-            out_sig=[self.OUTPUT_TYPE],
+            out_sig=[self.OUTPUT_TYPE]*output_count,
         )
 
-        self.sample_rate = sample_rate
-        self.freq        = freq
+        self.sample_rate  = sample_rate
+        self.freq         = freq
+        self.output_count = output_count
 
         self.buffer = np.array([], dtype=self.OUTPUT_TYPE)
 
@@ -111,13 +112,15 @@ class AmaltheaSource(gr.sync_block):
 
         out = output_items[0]
 
-        sample_count = min(len(self.buffer), len(out))
+        sample_count = min(int(len(self.buffer) / self.output_count), len(out))
 
         if sample_count == 0:
             return 0
 
-        out[:sample_count] = self.buffer[:sample_count]
-        self.buffer = self.buffer[sample_count:]
+        for i in range(self.output_count):
+            out = output_items[i]
+            out[:sample_count] = self.buffer[i:sample_count*self.output_count:self.output_count]
+        self.buffer = self.buffer[sample_count*self.output_count:]
         return sample_count
 
     def stop(self):

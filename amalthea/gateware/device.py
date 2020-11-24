@@ -21,6 +21,8 @@ from .radio                          import IQReceiver, RadioSPI
 from .demod                          import CORDICDemod
 from .stream                         import StreamCombiner
 
+from ..gnuradio.amaltheasource import AmaltheaSource
+
 
 VENDOR_ID  = 0x16d0
 PRODUCT_ID = 0x0f3b
@@ -97,6 +99,7 @@ class Device(Elaboratable):
         self._blocks = {}
         self._usb_outputs = []
         self._connections = []
+        self._usb_connections = []
 
     def get_rx(self):
         return self._rx
@@ -114,10 +117,17 @@ class Device(Elaboratable):
         sink_block   = self._blocks[sink_id]
         self._connections.append(sink_block.input.stream_eq(source_block.outputs[source_output]))
 
-    def connect_usb(self, source):
+    def connect_usb(self, source, sink):
         print(f"connect_usb {source}")
         block_id, output_id = source
         self._usb_outputs.append(self._blocks[block_id].outputs[output_id])
+        self._usb_connections.append((len(self._usb_outputs)-1, sink))
+
+    def finalize_usb_connections(self, tb):
+        self._usb_source = AmaltheaSource(4e6, 2.45e9, len(self._usb_connections))
+        for conn in self._usb_connections:
+            tb.connect((self._usb_source, conn[0]), conn[1])
+
 
     def create_descriptors(self):
         """ Create the descriptors we want to use for our device. """

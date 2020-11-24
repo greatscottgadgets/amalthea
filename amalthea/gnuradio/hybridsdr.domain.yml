@@ -9,4 +9,4 @@ templates:
 -   type: [hybridsdr, hybridsdr]
     connect: self.amalthea_device.connect(("${ source.parent_block.name }", ${ source.key }), ("${ sink.parent_block.name }", ${ sink.key }))
 -   type: [hybridsdr, stream]
-    connect: self.amalthea_device.connect_usb(("${ source.parent_block.name }", ${ source.key }))
+    connect: self.amalthea_device.connect_usb(("${ source.parent_block.name }", ${ source.key }), ${ make_port_sig(sink) })
