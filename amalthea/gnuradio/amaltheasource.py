@@ -24,7 +24,6 @@ TRANSFER_QUEUE_DEPTH = 16
 
 class AmaltheaSource(gr.sync_block):
     BLOCK_NAME='Amalthea Source'
-    OUTPUT_TYPE=np.float32
 
     def _transfer_completed(self, transfer: usb1.USBTransfer):
 
@@ -33,26 +32,27 @@ class AmaltheaSource(gr.sync_block):
         # If the transfer completed.
         if status in (usb1.TRANSFER_COMPLETED,):
             buf = np.frombuffer(transfer.getBuffer(), dtype=np.int16)
-            self.buffer = np.append(self.buffer, buf.astype(float)/32768)
+            self.buffer = np.append(self.buffer, (buf.astype(np.float32)/32768))
             transfer.submit()
 
         else:
             # TODO: handle errors
             failed_out = status
 
-    def __init__(self, sample_rate, freq, output_count=1):
+    def __init__(self, sample_rate, freq, out_sig=[np.float32]):
         gr.sync_block.__init__(
             self,
             name=self.BLOCK_NAME,
             in_sig=None,
-            out_sig=[self.OUTPUT_TYPE]*output_count,
+            out_sig=out_sig,
         )
+        self._out_sig = out_sig
+        self._struct = np.dtype([(str(i), t) for (i,t) in enumerate(self._out_sig)])
 
         self.sample_rate  = sample_rate
         self.freq         = freq
-        self.output_count = output_count
 
-        self.buffer = np.array([], dtype=self.OUTPUT_TYPE)
+        self.buffer = np.array([], dtype=np.float32)
 
         self.context = usb1.USBContext()
 
@@ -110,17 +110,25 @@ class AmaltheaSource(gr.sync_block):
     def work(self, input_items, output_items):
         self.context.handleEvents()
 
-        out = output_items[0]
+        # Number of `buffer` samples for each structured sample
+        sample_size = int(self._struct.itemsize / self.buffer.dtype.itemsize)
 
-        sample_count = min(int(len(self.buffer) / self.output_count), len(out))
+        # Round length down to a multiple of sample_size
+        usable_length = len(self.buffer) - (len(self.buffer)%sample_size)
+
+        # Cast buffer to np structured array
+        view = self.buffer[:usable_length].view(self._struct)
+
+        # Take minimum of available samples / available output space
+        sample_count = min(len(view), len(output_items[0]))
 
         if sample_count == 0:
             return 0
 
-        for i in range(self.output_count):
+        for i in range(len(self._out_sig)):
             out = output_items[i]
-            out[:sample_count] = self.buffer[i:sample_count*self.output_count:self.output_count]
-        self.buffer = self.buffer[sample_count*self.output_count:]
+            out[:sample_count] = view[str(i)][:sample_count]
+        self.buffer = self.buffer[sample_count*sample_size:]
         return sample_count
 
     def stop(self):

@@ -41,7 +41,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [271, 163]
+    coordinate: [332, 39]
     rotation: 0
     state: true
 - name: samp_rate
@@ -69,7 +69,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [318, 255]
+    coordinate: [224, 320]
     rotation: 0
     state: true
 - name: amalthea_rx_0
@@ -84,7 +84,26 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [114, 245]
+    coordinate: [71, 182]
+    rotation: 0
+    state: true
+- name: fosphor_qt_sink_c_0
+  id: fosphor_qt_sink_c
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    freq_center: '0'
+    freq_span: samp_rate
+    gui_hint: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    wintype: firdes.WIN_BLACKMAN_hARRIS
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [312, 140]
     rotation: 0
     state: true
 - name: import_0
@@ -97,7 +116,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [804, 40]
+    coordinate: [780, 34]
     rotation: 0
     state: true
 - name: import_1
@@ -110,7 +129,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [951, 37]
+    coordinate: [780, 84]
     rotation: 0
     state: true
 - name: qtgui_time_sink_x_0
@@ -167,8 +186,8 @@ blocks:
     marker8: '-1'
     marker9: '-1'
     name: '""'
-    nconnections: '2'
-    size: '1024000'
+    nconnections: '3'
+    size: '10240'
     srate: samp_rate
     stemplot: 'False'
     style1: '1'
@@ -207,7 +226,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [746, 236]
+    coordinate: [516, 259]
     rotation: 0
     state: true
 - name: snippet_0
@@ -226,14 +245,16 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [570, 40]
+    coordinate: [548, 33]
     rotation: 0
     state: true
 
 connections:
 - [amalthea_demod_0, '0', qtgui_time_sink_x_0, '0']
 - [amalthea_demod_0, '1', qtgui_time_sink_x_0, '1']
+- [amalthea_demod_0, '2', qtgui_time_sink_x_0, '2']
 - [amalthea_rx_0, '0', amalthea_demod_0, '0']
+- [amalthea_rx_0, '0', fosphor_qt_sink_c_0, '0']
 
 metadata:
   file_format: 1

@@ -7,6 +7,8 @@ import logging
 import time
 import usb1
 
+import numpy as np
+
 from nmigen                          import *
 from nmigen.lib.fifo                 import AsyncFIFO
 
@@ -19,7 +21,7 @@ from luna.gateware.usb.usb2.request  import USBRequestHandler
 
 from .radio                          import IQReceiver, RadioSPI
 from .demod                          import CORDICDemod
-from .stream                         import StreamCombiner
+from .stream                         import IQStream, SampleStream, StreamCombiner
 
 from ..gnuradio.amaltheasource import AmaltheaSource
 
@@ -124,7 +126,15 @@ class Device(Elaboratable):
         self._usb_connections.append((len(self._usb_outputs)-1, sink))
 
     def finalize_usb_connections(self, tb):
-        self._usb_source = AmaltheaSource(4e6, 2.45e9, len(self._usb_connections))
+        def to_np_type(output):
+            if isinstance(output, IQStream):
+                return np.complex64
+            if isinstance(output, SampleStream):
+                return np.float32
+            raise TypeError("Unknown stream type")
+
+        signature = list(map(to_np_type, self._usb_outputs))
+        self._usb_source = AmaltheaSource(4e6, 2.45e9, signature)
         for conn in self._usb_connections:
             tb.connect((self._usb_source, conn[0]), conn[1])
 
