@@ -2,23 +2,11 @@ id: amalthea_demod
 label: Amalthea Demod
 category: '[Amalthea]'
 
-parameters:
--   id: type
-    label: Type
-    dtype: enum
-    options: [hybridsdr, stream]
-    option_labels: [HybridSDR, GRC Stream]
-    option_attributes:
-        domain: [hybridsdr, stream]
-    hide: part
-
-
 templates:
   imports: |-
       import amalthea
   make: |
       self.amalthea_device.add_block("${id}", amalthea.gateware.demod.CORDICDemod(13))
-
 
 inputs:
 - domain: hybridsdr
