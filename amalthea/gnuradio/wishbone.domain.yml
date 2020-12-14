@@ -1,0 +1,13 @@
+id: wishbone
+label: Wishbone
+color: "#ff00ff"
+
+multiple_connections_per_input: false
+multiple_connections_per_output: true
+
+templates:
+-   type: [wishbone, stream]
+    connect: |-
+        self.${source.parent_block.name}_stream = amalthea.gateware.wishbone_example.StreamAdapter(self.${source.parent_block.name})
+        self.amalthea_device.add_block("${source.parent_block.name}_stream", self.${source.parent_block.name}_stream)
+        self.amalthea_device.connect_usb(("${ source.parent_block.name }_stream", ${ source.key }), ${ make_port_sig(sink) })

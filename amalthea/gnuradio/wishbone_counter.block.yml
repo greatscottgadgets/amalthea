@@ -1,0 +1,18 @@
+id: wishbone_counter
+label: Wishbone Counter Example
+category: '[Amalthea]'
+
+templates:
+  imports: |-
+      import amalthea.gateware.wishbone_example as wishbone_example
+  make: |-
+      self.${id} = wishbone_example.WishboneCounter()
+      self.amalthea_device.add_block("${id}", self.${id})
+
+outputs:
+- domain: wishbone
+  label: count
+  dtype: float
+  optional: true
+
+file_format: 1
