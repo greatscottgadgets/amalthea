@@ -4,3 +4,5 @@ __pycache__/
 
 amalthea/gateware/build/
 amalthea/gnuradio/example/*.py
+
+docs/_build/
