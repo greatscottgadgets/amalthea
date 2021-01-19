@@ -102,9 +102,9 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [312, 140]
+    coordinate: [312, 139]
     rotation: 0
-    state: true
+    state: enabled
 - name: import_0
   id: import
   parameters:

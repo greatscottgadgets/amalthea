@@ -18,6 +18,7 @@ from usb_protocol.emitters           import DeviceDescriptorCollection
 from luna                            import top_level_cli
 from luna.usb2                       import *
 from luna.gateware.usb.usb2.request  import USBRequestHandler
+from luna.gateware.platform          import get_appropriate_platform
 
 from .radio                          import IQReceiver, RadioSPI
 from .demod                          import CORDICDemod
@@ -124,6 +125,13 @@ class Device(Elaboratable):
         block_id, output_id = source
         self._usb_outputs.append(self._blocks[block_id].outputs[output_id])
         self._usb_connections.append((len(self._usb_outputs)-1, sink))
+
+    def flash(self):
+        platform = get_appropriate_platform()
+        plan = platform.build(self,
+            do_program=True,
+            build_dir='/tmp/amalthea_build',
+        )
 
     def finalize_usb_connections(self, tb):
         def to_np_type(output):

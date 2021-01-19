@@ -41,7 +41,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [332, 39]
+    coordinate: [268, 109]
     rotation: 0
     state: true
 - name: samp_rate
@@ -64,12 +64,11 @@ blocks:
     comment: ''
     maxoutbuf: '0'
     minoutbuf: '0'
-    type: hybridsdr
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [224, 320]
+    coordinate: [208, 282]
     rotation: 0
     state: true
 - name: amalthea_rx_0
@@ -84,7 +83,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [71, 182]
+    coordinate: [40, 217]
     rotation: 0
     state: true
 - name: fosphor_qt_sink_c_0
@@ -103,7 +102,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [312, 140]
+    coordinate: [499, 155]
     rotation: 0
     state: true
 - name: import_0
@@ -116,7 +115,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [780, 34]
+    coordinate: [546, 18]
     rotation: 0
     state: true
 - name: import_1
@@ -129,7 +128,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [780, 84]
+    coordinate: [549, 67]
     rotation: 0
     state: true
 - name: qtgui_time_sink_x_0
@@ -226,14 +225,14 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [516, 259]
+    coordinate: [507, 256]
     rotation: 0
     state: true
 - name: snippet_0
   id: snippet
   parameters:
     alias: ''
-    code: 'top_level_cli(self.amalthea_device)
+    code: 'self.amalthea_device.flash()
 
       time.sleep(10)
 
@@ -245,7 +244,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [548, 33]
+    coordinate: [310, 18]
     rotation: 0
     state: true
 
