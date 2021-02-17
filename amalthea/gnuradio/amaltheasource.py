@@ -56,6 +56,12 @@ class AmaltheaSource(gr.sync_block):
 
         self.context = usb1.USBContext()
 
+        # Poll for device availablility.
+        timeout = 10
+        while self.context.getByVendorIDAndProductID(VENDOR_ID, PRODUCT_ID) == None and timeout:
+            timeout -= 1
+            time.sleep(1)
+
         # Grab a reference to our device...
         self.device = self.context.openByVendorIDAndProductID(0x16d0, 0x0f3b)
 

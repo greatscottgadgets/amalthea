@@ -68,7 +68,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [208, 282]
+    coordinate: [225, 307]
     rotation: 0
     state: true
 - name: amalthea_rx_0
@@ -116,19 +116,6 @@ blocks:
     bus_source: false
     bus_structure: null
     coordinate: [546, 18]
-    rotation: 0
-    state: true
-- name: import_1
-  id: import
-  parameters:
-    alias: ''
-    comment: ''
-    imports: import time
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [549, 67]
     rotation: 0
     state: true
 - name: qtgui_time_sink_x_0
@@ -225,7 +212,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [507, 256]
+    coordinate: [537, 317]
     rotation: 0
     state: true
 - name: snippet_0
@@ -233,8 +220,6 @@ blocks:
   parameters:
     alias: ''
     code: 'self.amalthea_device.flash()
-
-      time.sleep(10)
 
       self.amalthea_device.finalize_usb_connections(self)'
     comment: ''
