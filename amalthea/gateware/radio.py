@@ -11,41 +11,6 @@ import unittest
 
 from .stream import IQStream
 
-class Radio(Elaboratable):
-    """ AT86RF215 radio
-    """
-    def __init__(self):
-        self.rst = Signal()
-        self.irq = Signal()
-
-        self.clk  = Signal()
-        self.sel  = Signal()
-        self.copi = Signal()
-        self.cipo = Signal()
-
-    def elaborate(self, platform):
-        m = Module()
-
-        with m.FSM():
-            with m.Case("reset"):
-                m.d.sync += self.rst.eq(1)
-                # TODO: delay some? or wait till IRQ is stable low?
-
-            with m.Case("wake"):
-                # After reset, only IRQS.WAKEUP is enabled.
-                # Wait for IRQ to go high to indicate target is ready.
-                with m.If(self.irq):
-                    m.next = "config"
-
-            with m.Case("config"):
-                # TODO: SPI config - IQ mode, freq, bw, rate, tx/rx mode, etc.
-                pass
-
-            with m.Case("run"):
-                pass
-
-            return m
-
 
 DelayState = namedtuple("DelayState", "delay next_state")
 
