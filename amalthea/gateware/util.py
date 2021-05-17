@@ -1,7 +1,10 @@
 from nmigen import *
-from nmigen.back.pysim import Simulator
+from nmigen.sim import Simulator
 from nmigen.build import *
 from nmigen.cli import main
+from collections.abc import Iterable
+from nmigen.hdl.ast import Statement
+from nmigen.sim import Settle
 
 import unittest
 
@@ -83,6 +86,49 @@ class TestSerializer(unittest.TestCase):
         with sim.write_vcd("serializer.vcd", "serializer.gtkw", traces=[]):
             sim.run()
 
+
+def variable_rotate_left(sig, i):
+    w = sig.width
+    return Cat(sig, sig).bit_select(w-i, w)
+
+def flatten(i):
+    for e in i:
+        if isinstance(e, Iterable):
+            yield from flatten(e)
+        else:
+            yield e
+
+class TestRotate(unittest.TestCase):
+
+    def assertStatement(self, stmt, inputs, output, reset=0):
+        inputs = [Value.cast(i) for i in inputs]
+        output = Value.cast(output)
+
+        isigs = [Signal(i.shape(), name=n) for i, n in zip(inputs, "abcd")]
+        osig  = Signal(output.shape(), name="y", reset=reset)
+
+        stmt = stmt(osig, *isigs)
+        frag = Fragment()
+        frag.add_statements(stmt)
+        for signal in flatten(s._lhs_signals() for s in Statement.cast(stmt)):
+            frag.add_driver(signal)
+
+        sim = Simulator(frag)
+        def process():
+            for isig, input in zip(isigs, inputs):
+                yield isig.eq(input)
+            yield Settle()
+            self.assertEqual((yield osig), output.value)
+        sim.add_process(process)
+        with sim.write_vcd("test.vcd", "test.gtkw", traces=[*isigs, osig]):
+            sim.run()
+
+    def test_rotate(self):
+        stmt = lambda y, a, b: y.eq(variable_rotate_left(a, b))
+        self.assertStatement(stmt, [C(0b1100), 0], C(0b1100))
+        self.assertStatement(stmt, [C(0b1100), 1], C(0b1001))
+        self.assertStatement(stmt, [C(0b1100), 2], C(0b0011))
+        self.assertStatement(stmt, [C(0b1100), 3], C(0b0110))
 
 if __name__ == "__main__":
    unittest.main()
