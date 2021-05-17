@@ -1,10 +1,9 @@
 from nmigen import *
-from nmigen.sim import Simulator
+from nmigen.sim import Simulator, Settle
 from nmigen.build import *
 from nmigen.cli import main
 from collections.abc import Iterable
 from nmigen.hdl.ast import Statement
-from nmigen.sim import Settle
 
 import unittest
 
@@ -88,7 +87,7 @@ class TestSerializer(unittest.TestCase):
 
 
 def variable_rotate_left(sig, i):
-    w = sig.width
+    w = len(sig)
     return Cat(sig, sig).bit_select(w-i, w)
 
 def flatten(i):
