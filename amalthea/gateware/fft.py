@@ -1,6 +1,9 @@
 from nmigen import *
 from nmigen.sim import Simulator
+from .types import Complex
 from .util import variable_rotate_left
+import cmath
+import math
 import unittest
 
 class FFT(Elaboratable):
@@ -78,6 +81,83 @@ class TestAddressGenerator(unittest.TestCase):
 
         sim.add_sync_process(process)
         with sim.write_vcd("agu.vcd", "agu.gtkw", traces=[]):
+            sim.run()
+
+
+class TwiddleFactors(Elaboratable):
+    def __init__(self, fft_size, sample_width):
+        self.fft_size = fft_size
+
+        tf_count = int(fft_size/2)
+
+        def tf(k):
+            tf = cmath.exp(1j * math.tau * k / fft_size)
+            m = 2**(sample_width-1)-1
+            return (round(tf.real*m), round(tf.imag*m))
+
+        twiddle_factors = [tf(k) for k in range(tf_count)]
+        tf_real = [x[0] for x in twiddle_factors]
+        tf_imag = [x[1] for x in twiddle_factors]
+        self.mem_real = Memory(width=sample_width, depth=len(twiddle_factors), init=tf_real)
+        self.mem_imag = Memory(width=sample_width, depth=len(twiddle_factors), init=tf_imag)
+        self.out   = Complex(sample_width)
+        self.addr  = Signal(range(tf_count))
+
+    
+    def elaborate(self, platform):
+        m = Module()
+        m.submodules.rd_real = rd_real = self.mem_real.read_port()
+        m.submodules.rd_imag = rd_imag = self.mem_imag.read_port()
+        m.d.comb += [
+            rd_real.addr.eq(self.addr),
+            rd_imag.addr.eq(self.addr),
+            self.out.real.eq(rd_real.data),
+            self.out.imag.eq(rd_imag.data),
+        ]
+        return m
+
+class TestTwiddleFactors(unittest.TestCase):
+    def test_tf(self):
+        clk = 60e6
+        m = TwiddleFactors(32, 16)
+
+        # cast to unsigned
+        real = Signal(16)
+        imag = Signal(16)
+
+        sim = Simulator(m)
+        sim.add_clock(1/clk)
+
+        def process():
+            expected_tfs = [
+                (0x7fff, 0x0000),
+                (0x7d89, 0x18f9), # 0x1859 in the paper, typo?
+                (0x7641, 0x30fb),
+                (0x6a6d, 0x471c),
+                (0x5a82, 0x5a82),
+                (0x471c, 0x6a6d),
+                (0x30fb, 0x7641),
+                (0x18f9, 0x7d89),
+                (0x0000, 0x7fff),
+                (0xe707, 0x7d89),
+                (0xcf05, 0x7641),
+                (0xb8e4, 0x6a6d),
+                (0xa57e, 0x5a82),
+                (0x9593, 0x471c),
+                (0x89bf, 0x30fb),
+                (0x8277, 0x18f9),
+            ]
+            for i in range(16):
+                yield m.addr.eq(i)
+                yield
+                yield
+                yield real.eq(m.out.real)
+                yield imag.eq(m.out.imag)
+                yield
+                self.assertEqual(((yield real), (yield imag)), expected_tfs[i])
+
+        sim.add_sync_process(process)
+        with sim.write_vcd("tf.vcd", "tf.gtkw", traces=[]):
             sim.run()
 
 if __name__ == "__main__":
