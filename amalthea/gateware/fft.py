@@ -1,4 +1,5 @@
 from nmigen import *
+from nmigen.hdl.dsl import _ModuleBuilderSubmodules
 from nmigen.sim import Simulator
 from .types import Complex
 from .util import variable_rotate_left
@@ -82,6 +83,28 @@ class TestAddressGenerator(unittest.TestCase):
         sim.add_sync_process(process)
         with sim.write_vcd("agu.vcd", "agu.gtkw", traces=[]):
             sim.run()
+
+
+class Butterfly(Elaboratable):
+    def __init__(self, sample_width):
+        self.in_a           = Complex(sample_width)
+        self.in_b           = Complex(sample_width)
+        self.out_a          = Complex(sample_width)
+        self.out_b          = Complex(sample_width)
+        self.twiddle_factor = Complex(sample_width)
+
+    def elaborate(self, platform):
+        m = Module()
+
+        a = self.in_a
+        b = self.in_b * self.twiddle_factor
+
+        m.d.comb += [
+            self.out_a.eq(a + b),
+            self.out_b.eq(a - b),
+        ]
+
+        return m
 
 
 class TwiddleFactors(Elaboratable):
