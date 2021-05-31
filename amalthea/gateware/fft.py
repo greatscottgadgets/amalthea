@@ -1,7 +1,7 @@
 from nmigen import *
 from nmigen.hdl.dsl import _ModuleBuilderSubmodules
 from nmigen.sim import Simulator
-from .types import Complex
+from .types.complex import Complex
 from .util import variable_rotate_left
 import cmath
 import math
