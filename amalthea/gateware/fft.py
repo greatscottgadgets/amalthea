@@ -2,6 +2,7 @@ from nmigen import *
 from nmigen.hdl.dsl import _ModuleBuilderSubmodules
 from nmigen.sim import Simulator
 from .types.complex import Complex
+from .types.fixed_point import Q
 from .util import variable_rotate_left
 import cmath
 import math
@@ -87,11 +88,12 @@ class TestAddressGenerator(unittest.TestCase):
 
 class Butterfly(Elaboratable):
     def __init__(self, sample_width):
-        self.in_a           = Complex(sample_width)
-        self.in_b           = Complex(sample_width)
-        self.out_a          = Complex(sample_width)
-        self.out_b          = Complex(sample_width)
-        self.twiddle_factor = Complex(sample_width)
+        self.sample_width   = sample_width
+        self.in_a           = Complex(shape=Q(1, sample_width-1))
+        self.in_b           = Complex(shape=Q(1, sample_width-1))
+        self.out_a          = Complex(shape=Q(1, sample_width-1))
+        self.out_b          = Complex(shape=Q(1, sample_width-1))
+        self.twiddle_factor = Complex(shape=Q(1, sample_width-1))
 
     def elaborate(self, platform):
         m = Module()
@@ -123,10 +125,10 @@ class TwiddleFactors(Elaboratable):
         tf_imag = [x[1] for x in twiddle_factors]
         self.mem_real = Memory(width=sample_width, depth=len(twiddle_factors), init=tf_real)
         self.mem_imag = Memory(width=sample_width, depth=len(twiddle_factors), init=tf_imag)
-        self.out   = Complex(sample_width)
+        self.out   = Complex(shape=Q(1,sample_width-1))
         self.addr  = Signal(range(tf_count))
 
-    
+
     def elaborate(self, platform):
         m = Module()
         m.submodules.rd_real = rd_real = self.mem_real.read_port()
@@ -174,8 +176,8 @@ class TestTwiddleFactors(unittest.TestCase):
                 yield m.addr.eq(i)
                 yield
                 yield
-                yield real.eq(m.out.real)
-                yield imag.eq(m.out.imag)
+                yield real.eq(m.out.real.value)
+                yield imag.eq(m.out.imag.value)
                 yield
                 self.assertEqual(((yield real), (yield imag)), expected_tfs[i])
 

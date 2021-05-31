@@ -18,7 +18,7 @@ class FixedPointShape:
     def signal_shape(self):
         return Shape(len(self), self.signed)
 
-    def value(self, value):
+    def value(self, value=None):
         """Create a FixedPointValue with this shape"""
         return FixedPointValue(self, value)
 
@@ -49,6 +49,15 @@ class FixedPointValue:
             self.value = Const(round(value * (2**self.shape.fraction_bits)), shape.signal_shape())
         else:
             raise TypeError(f"cannot create FixedPointValue from {value}")
+
+    def eq(self, other):
+        if isinstance(other, FixedPointValue):
+            return [self.value.eq(other.value)]
+        elif isinstance(other, Value):
+            return [self.value.eq(other)]
+        else:
+            raise TypeError(f"unsupported {type(other)}")
+
 
     def to_float(self):
         """Convert to float (only usable in simulation)"""
