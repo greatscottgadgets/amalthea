@@ -6,3 +6,6 @@ amalthea/gateware/build/
 amalthea/gnuradio/example/*.py
 
 docs/_build/
+
+*.gtkw
+*.vcd
