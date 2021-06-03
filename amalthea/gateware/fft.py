@@ -87,13 +87,13 @@ class TestAddressGenerator(unittest.TestCase):
 
 
 class Butterfly(Elaboratable):
-    def __init__(self, sample_width):
-        self.sample_width   = sample_width
-        self.in_a           = Complex(shape=Q(1, sample_width-1))
-        self.in_b           = Complex(shape=Q(1, sample_width-1))
-        self.out_a          = Complex(shape=Q(1, sample_width-1))
-        self.out_b          = Complex(shape=Q(1, sample_width-1))
-        self.twiddle_factor = Complex(shape=Q(1, sample_width-1))
+    def __init__(self, sample_shape):
+        self.sample_shape   = sample_shape
+        self.in_a           = Complex(shape=sample_shape)
+        self.in_b           = Complex(shape=sample_shape)
+        self.out_a          = Complex(shape=sample_shape)
+        self.out_b          = Complex(shape=sample_shape)
+        self.twiddle_factor = Complex(shape=sample_shape)
 
     def elaborate(self, platform):
         m = Module()
@@ -110,22 +110,22 @@ class Butterfly(Elaboratable):
 
 
 class TwiddleFactors(Elaboratable):
-    def __init__(self, fft_size, sample_width):
+    def __init__(self, fft_size, sample_shape):
         self.fft_size = fft_size
 
         tf_count = int(fft_size/2)
 
         def tf(k):
             tf = cmath.exp(1j * math.tau * k / fft_size)
-            m = 2**(sample_width-1)-1
+            m = 2**sample_shape.fraction_bits - 1
             return (round(tf.real*m), round(tf.imag*m))
 
         twiddle_factors = [tf(k) for k in range(tf_count)]
         tf_real = [x[0] for x in twiddle_factors]
         tf_imag = [x[1] for x in twiddle_factors]
-        self.mem_real = Memory(width=sample_width, depth=len(twiddle_factors), init=tf_real)
-        self.mem_imag = Memory(width=sample_width, depth=len(twiddle_factors), init=tf_imag)
-        self.out   = Complex(shape=Q(1,sample_width-1))
+        self.mem_real = Memory(width=len(sample_shape), depth=len(twiddle_factors), init=tf_real)
+        self.mem_imag = Memory(width=len(sample_shape), depth=len(twiddle_factors), init=tf_imag)
+        self.out   = Complex(shape=sample_shape)
         self.addr  = Signal(range(tf_count))
 
 
@@ -144,7 +144,7 @@ class TwiddleFactors(Elaboratable):
 class TestTwiddleFactors(unittest.TestCase):
     def test_tf(self):
         clk = 60e6
-        m = TwiddleFactors(32, 16)
+        m = TwiddleFactors(32, Q(1,15))
 
         # cast to unsigned
         real = Signal(16)

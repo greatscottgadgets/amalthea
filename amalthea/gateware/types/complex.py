@@ -1,4 +1,5 @@
 from nmigen import *
+from nmigen.hdl.mem import *
 from .fixed_point import FixedPointValue
 
 class Complex:
