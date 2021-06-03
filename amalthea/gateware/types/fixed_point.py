@@ -1,4 +1,4 @@
-from nmigen import Cat, Const, Module, Shape, Signal, Value
+from nmigen import Cat, Const, Module, Shape, Signal, Value, tracer
 from nmigen.sim import Simulator
 import unittest
 
@@ -18,9 +18,9 @@ class FixedPointShape:
     def signal_shape(self):
         return Shape(len(self), self.signed)
 
-    def value(self, value=None):
+    def value(self, value=None, name=None):
         """Create a FixedPointValue with this shape"""
-        return FixedPointValue(self, value)
+        return FixedPointValue(self, value=value, name=name)
 
     def __eq__(self, other):
         return self.integer_bits == other.integer_bits \
@@ -39,10 +39,11 @@ def Q(integer_bits, fraction_bits, signed=True):
 
 
 class FixedPointValue:
-    def __init__(self, shape, value=None):
+    def __init__(self, shape, value=None, name=None):
         self.shape = shape
+        self.name = name or tracer.get_var_name(depth=2, default="FixedPoint")
         if value is None:
-            self.value = Signal(shape.signal_shape())
+            self.value = Signal(shape.signal_shape(), name=self.name)
         elif isinstance(value, Value):
             self.value = value
         elif isinstance(value, (int, float)):

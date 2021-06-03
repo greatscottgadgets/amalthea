@@ -1,20 +1,22 @@
 from nmigen import *
+from nmigen import tracer
 from nmigen.hdl.mem import *
 from .fixed_point import FixedPointValue
 
 class Complex:
-    def __init__(self, *, shape=None, value=None):
+    def __init__(self, *, shape=None, value=None, name=None):
         self.shape = shape
+        self.name = name or tracer.get_var_name(depth=2, default="Complex")
         if value is None:
             if shape is None:
                 raise ValueError(f"must specify `shape` argument")
-            self.real = shape.value()
-            self.imag = shape.value()
+            self.real = shape.value(name=self.name+'_real')
+            self.imag = shape.value(name=self.name+'_imag')
         elif isinstance(value, complex):
             if shape is None:
                 raise ValueError(f"must specify `shape` argument for complex value '{value}'")
-            self.real = shape.value(value.real)
-            self.imag = shape.value(value.imag)
+            self.real = shape.value(value.real, name=self.name+'_real')
+            self.imag = shape.value(value.imag, name=self.name+'_imag')
         elif isinstance(value, tuple) and isinstance(value[0], FixedPointValue) and isinstance(value[1], FixedPointValue):
             assert shape is None
             self.real = value[0]
