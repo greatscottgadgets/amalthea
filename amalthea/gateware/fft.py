@@ -20,14 +20,14 @@ class AddressGenerator(Elaboratable):
         self.done         = Signal()
         self.addr_a       = Signal(range(butterfly_count*2))
         self.addr_b       = Signal(range(butterfly_count*2))
-        self.addr_twiddle = Signal(range(level_count))
+        self.addr_twiddle = Signal(range(butterfly_count))
 
     def elaborate(self, platform):
         m = Module()
 
         level        = Signal(range(self.level_count))
         index        = Signal(range(self.butterfly_count))
-        twiddle_mask = Signal.like(level)
+        twiddle_mask = Signal.like(index)
 
         final_level = (level == self.level_count - 1)
         next_level  = (index == self.butterfly_count - 1)
@@ -77,9 +77,11 @@ class TestAddressGenerator(unittest.TestCase):
                 (0,8), (16,24), (1,9), (17,25), (2,10), (18,26), (3,11), (19,27), (4,12), (20,28), (5,13), (21,29), (6,14), (22,30), (7,15), (23,31),
                 (0,16), (1,17), (2,18), (3,19), (4,20), (5,21), (6,22), (7,23), (8,24), (9,25), (10,26), (11,27), (12,28), (13,29), (14,30), (15,31),
             ]
-            for i in range(5*16):
-                self.assertEqual(((yield m.addr_a), (yield m.addr_b)), expected_addrs[i])
-                yield
+            for i in range(5):
+                for j in range(16):
+                    self.assertEqual(((yield m.addr_a), (yield m.addr_b)), expected_addrs[i*16+j])
+                    self.assertEqual((yield m.addr_twiddle), ((0xfffffff0 >> i) & 0xf) & j)
+                    yield
 
         sim.add_sync_process(process)
         with sim.write_vcd("agu.vcd", "agu.gtkw", traces=[]):
