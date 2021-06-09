@@ -2,6 +2,12 @@ from nmigen import *
 from nmigen import tracer
 from nmigen.hdl.mem import *
 from .fixed_point import FixedPointValue
+from nmigen.sim import *
+
+import cmath
+import itertools
+import unittest
+
 
 class Complex:
     def __init__(self, *, shape=None, value=None, name=None):
@@ -70,6 +76,27 @@ class Complex:
 
     def __mul__(self, other):
         real = self.real * other.real - self.imag * other.imag
-        imag = self.real * other.imag - self.imag * other.real
+        imag = self.real * other.imag + self.imag * other.real
         assert real.shape == imag.shape
         return Complex(value=(real, imag))
+
+
+class TestComplex(unittest.TestCase):
+    def check(self, v, expected):
+        m = Module()
+        sim = Simulator(m)
+        def process():
+            self.assertAlmostEqual((yield from v.to_complex()), expected, delta=0.01)
+
+        sim.add_process(process)
+        sim.run()
+
+    def test_mul(self):
+        for a,b,c,d in itertools.permutations([0,1,-1,0.5,-0.5],4):
+            c1 = complex(a, b)
+            c2 = complex(c, d)
+            shape = Q(8,8)
+            self.check((Complex(shape=shape, value=c1)*Complex(shape=shape, value=c2)), c1*c2)
+
+if __name__ == "__main__":
+    unittest.main()
