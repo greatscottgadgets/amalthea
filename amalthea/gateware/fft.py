@@ -118,7 +118,7 @@ class TwiddleFactors(Elaboratable):
         tf_count = int(fft_size/2)
 
         def tf(k):
-            tf = cmath.exp(1j * math.tau * k / fft_size)
+            tf = cmath.exp(-1j * math.tau * k / fft_size)
             m = 2**sample_shape.fraction_bits - 1
             return (round(tf.real*m), round(tf.imag*m))
 
@@ -158,21 +158,21 @@ class TestTwiddleFactors(unittest.TestCase):
         def process():
             expected_tfs = [
                 (0x7fff, 0x0000),
-                (0x7d89, 0x18f9), # 0x1859 in the paper, typo?
-                (0x7641, 0x30fb),
-                (0x6a6d, 0x471c),
-                (0x5a82, 0x5a82),
-                (0x471c, 0x6a6d),
-                (0x30fb, 0x7641),
-                (0x18f9, 0x7d89),
-                (0x0000, 0x7fff),
-                (0xe707, 0x7d89),
-                (0xcf05, 0x7641),
-                (0xb8e4, 0x6a6d),
-                (0xa57e, 0x5a82),
-                (0x9593, 0x471c),
-                (0x89bf, 0x30fb),
-                (0x8277, 0x18f9),
+                (0x7d89, 0xe707),
+                (0x7641, 0xcf05),
+                (0x6a6d, 0xb8e4),
+                (0x5a82, 0xa57e),
+                (0x471c, 0x9593),
+                (0x30fb, 0x89bf),
+                (0x18f9, 0x8277),
+                (0x0000, 0x8001),
+                (0xe707, 0x8277),
+                (0xcf05, 0x89bf),
+                (0xb8e4, 0x9593),
+                (0xa57e, 0xa57e),
+                (0x9593, 0xb8e4),
+                (0x89bf, 0xcf05),
+                (0x8277, 0xe707),
             ]
             for i in range(16):
                 yield m.addr.eq(i)
