@@ -37,6 +37,11 @@ class FixedPointShape:
 def Q(integer_bits, fraction_bits, signed=True):
     return FixedPointShape(integer_bits, fraction_bits, signed)
 
+class FixedPointConst:
+    def __init__(self, shape, value):
+        self.shape = shape
+        self.value = round(value * (2**self.shape.fraction_bits))
+
 
 class FixedPointValue:
     def __init__(self, shape, value=None, name=None):
@@ -47,7 +52,7 @@ class FixedPointValue:
         elif isinstance(value, Value):
             self.value = value
         elif isinstance(value, (int, float)):
-            self.value = Const(round(value * (2**self.shape.fraction_bits)), shape.signal_shape())
+            self.value = Const(FixedPointConst(shape=shape, value=(value)).value)
         else:
             raise TypeError(f"cannot create FixedPointValue from {value}")
 

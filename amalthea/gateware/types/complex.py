@@ -1,13 +1,22 @@
 from nmigen import *
 from nmigen import tracer
 from nmigen.hdl.mem import *
-from .fixed_point import FixedPointValue
 from nmigen.sim import *
+from .fixed_point import FixedPointConst, FixedPointValue, Q
 
 import cmath
 import itertools
 import unittest
 
+class ComplexConst:
+    def __init__(self, shape, value):
+        self.shape = shape
+        self.real = FixedPointConst(shape, value.real)
+        self.imag = FixedPointConst(shape, value.imag)
+
+    def value(self):
+        mask = int(2**len(self.real.shape)-1)
+        return (self.real.value & mask) | ((self.imag.value & mask) << len(self.real.shape))
 
 class Complex:
     def __init__(self, *, shape=None, value=None, name=None):
@@ -42,7 +51,6 @@ class Complex:
             self.shape = shape
         else:
             raise TypeError(f"unsupported value {type(value)}")
-
 
     def eq(self, other):
         assert self.shape == other.shape, f"{self.shape} != {other.shape}"
