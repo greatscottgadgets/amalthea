@@ -1,15 +1,146 @@
 from nmigen import *
 from nmigen.hdl.dsl import _ModuleBuilderSubmodules
-from nmigen.sim import Simulator
-from .types.complex import Complex
+from nmigen.sim import Simulator, Settle
+from .types.complex import Complex, ComplexConst
 from .types.fixed_point import Q
 from .util import variable_rotate_left
 import cmath
 import math
+import numpy as np
 import unittest
 
 class FFT(Elaboratable):
-    pass
+    def __init__(self, fft_size, sample_shape):
+        self.fft_size = fft_size
+        levels = math.log2(fft_size)
+        assert levels.is_integer()
+        self.level_count = int(levels)
+        self.butterfly_count = int(fft_size / 2)
+
+        self.sample_shape = sample_shape
+        self.internal_shape = Q(sample_shape.integer_bits + self.level_count, sample_shape.fraction_bits)
+        self.twiddle_factor_shape = Q(1, len(self.internal_shape)-1)
+
+        self.mem = Memory(width=len(Complex(shape=self.internal_shape).value()), depth=fft_size)
+        self.read_addr = Signal(range(fft_size))
+        self.read_data = Signal(self.mem.width)
+
+        self.start = Signal()
+        self.done = Signal()
+
+        self._addr_gen = AddressGenerator(self.level_count, self.butterfly_count)
+        self._butterfly = Butterfly(self.internal_shape, self.twiddle_factor_shape)
+
+    def elaborate(self, platform):
+        m = Module()
+
+        next_address = Signal()
+        reset = Signal()
+
+        m.submodules.addr_gen = ResetInserter(reset)(
+            EnableInserter(next_address)(
+                self._addr_gen
+            )
+        )
+
+        m.submodules.butterfly = self._butterfly
+        m.submodules.twiddle_factors = twiddle_factors = TwiddleFactors(self.fft_size, self.twiddle_factor_shape)
+
+        m.submodules.read_a = read_a = self.mem.read_port(transparent=False)
+        m.submodules.read_b = read_b = self.mem.read_port(transparent=False)
+        m.submodules.write_a = write_a = self.mem.write_port()
+        m.submodules.write_b = write_b = self.mem.write_port()
+        m.d.comb += [
+            # Addresses
+            read_a.addr.eq(Mux(self.done, self.read_addr, self._addr_gen.addr_a)),
+            read_b.addr.eq(self._addr_gen.addr_b),
+            write_a.addr.eq(self._addr_gen.addr_a),
+            write_b.addr.eq(self._addr_gen.addr_b),
+            twiddle_factors.addr.eq(self._addr_gen.addr_twiddle),
+
+            # Data reads
+            self._butterfly.in_a.value().eq(read_a.data),
+            self._butterfly.in_b.value().eq(read_b.data),
+            self._butterfly.twiddle_factor.eq(twiddle_factors.out),
+            self.read_data.eq(read_a.data),
+
+            # Data writes
+            write_a.data.eq(self._butterfly.out_a.value()),
+            write_b.data.eq(self._butterfly.out_b.value()),
+        ]
+        with m.FSM() as fsm:
+            with m.State("IDLE"):
+                m.d.comb += [
+                    reset.eq(1),
+                    self.done.eq(1),
+                ]
+                with m.If(self.start):
+                    m.next = "READ"
+
+            with m.State("READ"):
+                m.d.comb += [
+                    read_a.en.eq(1),
+                    read_b.en.eq(1),
+                ]
+                m.next = "WAIT"
+                with m.If(self._addr_gen.done):
+                    m.next = "IDLE"
+
+            with m.State("WAIT"):
+                m.next = "WRITE"
+
+            with m.State("WRITE"):
+                m.d.comb += [
+                    write_a.en.eq(1),
+                    write_b.en.eq(1),
+                    next_address.eq(1),
+                ]
+                m.next = "READ"
+
+
+        return m
+
+
+class TestFFT(unittest.TestCase):
+    def test_fft(self):
+        clk = 60e6
+        m = FFT(32, Q(1,10))
+
+        input = [1+0j]*16 + [-1+0j]*16
+
+        # Map input to Complex fixed-point
+        data = list(map(lambda x: ComplexConst(m.internal_shape, x).value(), input))
+
+        # Re-order with bit-reversed indices & write to FFT memory
+        rev = lambda i: int('{:05b}'.format(i)[::-1], 2)
+        m.mem.init = [data[rev(i)] for i in range(len(data))]
+
+        sim = Simulator(m)
+        sim.add_clock(1/clk)
+
+        def process():
+            yield m.start.eq(1)
+            yield
+            yield m.start.eq(0)
+            yield
+
+            while True:
+                if ((yield m.done) == 1):
+                    break
+                yield
+
+            expected = np.fft.fft(input)
+            for i, sig in enumerate(m.mem._array):
+                self.assertAlmostEqual(
+                    (yield from Complex(shape=m.internal_shape, value=sig).to_complex()),
+                    expected[i],
+                    delta=0.02
+                )
+
+
+        sim.add_sync_process(process)
+        with sim.write_vcd("fft.vcd", "fft.gtkw", traces=[]):
+            sim.run()
 
 
 class AddressGenerator(Elaboratable):
