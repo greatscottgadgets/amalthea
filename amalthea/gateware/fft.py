@@ -89,23 +89,23 @@ class TestAddressGenerator(unittest.TestCase):
 
 
 class Butterfly(Elaboratable):
-    def __init__(self, sample_shape):
+    def __init__(self, sample_shape, twiddle_factor_shape):
         self.sample_shape   = sample_shape
         self.in_a           = Complex(shape=sample_shape)
         self.in_b           = Complex(shape=sample_shape)
         self.out_a          = Complex(shape=sample_shape)
         self.out_b          = Complex(shape=sample_shape)
-        self.twiddle_factor = Complex(shape=sample_shape)
+        self.twiddle_factor = Complex(shape=twiddle_factor_shape)
 
     def elaborate(self, platform):
         m = Module()
 
         a = self.in_a
         b = self.in_b * self.twiddle_factor
-
+        b = b.reshape(self.sample_shape)
         m.d.comb += [
-            self.out_a.eq(a + b),
-            self.out_b.eq(a - b),
+            self.out_a.eq((a + b).reshape(self.sample_shape)),
+            self.out_b.eq((a - b).reshape(self.sample_shape)),
         ]
 
         return m
