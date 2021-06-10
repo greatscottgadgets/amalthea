@@ -58,8 +58,10 @@ class FixedPointValue:
 
     def eq(self, other):
         if isinstance(other, FixedPointValue):
+            assert self.shape == other.shape
             return [self.value.eq(other.value)]
         elif isinstance(other, Value):
+            assert len(self.value) == len(other)
             return [self.value.eq(other)]
         else:
             raise TypeError(f"unsupported {type(other)}")
