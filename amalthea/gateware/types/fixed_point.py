@@ -52,7 +52,8 @@ class FixedPointValue:
         elif isinstance(value, Value):
             self.value = value
         elif isinstance(value, (int, float)):
-            self.value = Const(FixedPointConst(shape=shape, value=(value)).value)
+            val = FixedPointConst(value=value, shape=shape)
+            self.value = Const(val.value, shape=val.shape.signal_shape())
         else:
             raise TypeError(f"cannot create FixedPointValue from {value}")
 
