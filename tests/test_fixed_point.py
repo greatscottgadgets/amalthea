@@ -1,5 +1,5 @@
 
-from .fixed_point import *
+from amalthea.gateware.types.fixed_point import *
 
 class TestFixedPoint(unittest.TestCase):
     def check(self, v, expected):

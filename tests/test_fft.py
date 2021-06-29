@@ -1,4 +1,4 @@
-from .fft import *
+from amalthea.gateware.fft import *
 
 class TestFFT(unittest.TestCase):
     def test_fft(self):

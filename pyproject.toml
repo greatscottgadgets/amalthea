@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "amalthea"
+version = "0.1.0-dev.0"
+description = "amalthea"
+authors = ["Mike Walters <mike@flomp.net>"]
+license = "BSD"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+numpy = "^1"
+luna = {git = "https://github.com/greatscottgadgets/luna.git", branch = "main"}
+nmigen = {git = "https://github.com/nmigen/nmigen.git"}
+
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.2.4"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

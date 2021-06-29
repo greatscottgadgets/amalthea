@@ -17,7 +17,7 @@ setup(
         "relative_to": __file__,
         "version_scheme": "guess-next-dev",
         "local_scheme": lambda version : version.format_choice("+{node}", "+{node}.dirty"),
-        "fallback_version": "r0.0"
+        "fallback_version": "0.0"
     },
 
     # Imports / exports / requirements.

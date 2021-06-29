@@ -1,4 +1,4 @@
-from .complex import *
+from amalthea.gateware.types.complex import *
 
 class TestComplex(unittest.TestCase):
     def check(self, v, expected):
