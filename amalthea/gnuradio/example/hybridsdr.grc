@@ -1,6 +1,7 @@
 options:
   parameters:
     author: mike
+    catch_exceptions: 'True'
     category: '[GRC Hier Blocks]'
     cmake_opt: ''
     comment: ''
@@ -97,7 +98,7 @@ blocks:
     gui_hint: ''
     maxoutbuf: '0'
     minoutbuf: '0'
-    wintype: firdes.WIN_BLACKMAN_hARRIS
+    wintype: window.WIN_BLACKMAN_hARRIS
   states:
     bus_sink: false
     bus_source: false
@@ -223,7 +224,7 @@ blocks:
 
       self.amalthea_device.finalize_usb_connections(self)'
     comment: ''
-    priority: ''
+    priority: '1'
     section: main_after_init
   states:
     bus_sink: false
