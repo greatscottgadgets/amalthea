@@ -10,9 +10,9 @@ import xdg.BaseDirectory
 
 import numpy as np
 
-from nmigen                          import *
-from nmigen.lib.fifo                 import AsyncFIFO
-from nmigen.build.run                import LocalBuildProducts
+from amaranth                        import *
+from amaranth.lib.fifo               import AsyncFIFO
+from amaranth.build.run              import LocalBuildProducts
 
 from usb_protocol.types              import USBRequestType
 from usb_protocol.emitters           import DeviceDescriptorCollection

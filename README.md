@@ -28,4 +28,4 @@ The `amalthea/gnuradio/` directory contains blocks & example flowgraphs for crea
 
  * `hybridsdr.domain.yml` - This defines the `hybridsdr` IO port domain and how connections are made between `hybridsdr` ports.
  * `amalthea_device.block.yml` - This defines the Amalthea Device block, which represents overall device. This block handles gateware elaboration, build, and programming. It will also handle streaming data to/from the host over USB in later versions.
- * `{amalthea_rx,amalthea_demod}.block.yml` - These define some HybridSDR blocks, which represent DSP blocks that run on the FPGA itself. When instantiated, these are added as submodules to the overall nMigen design.
+ * `{amalthea_rx,amalthea_demod}.block.yml` - These define some HybridSDR blocks, which represent DSP blocks that run on the FPGA itself. When instantiated, these are added as submodules to the overall Amaranth design.

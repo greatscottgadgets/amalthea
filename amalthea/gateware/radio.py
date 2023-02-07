@@ -1,8 +1,8 @@
-from nmigen import *
-from nmigen.back.pysim import Simulator
-from nmigen.build import *
-from nmigen.cli import main
-from nmigen.hdl.ast import Past, Rose, Fell
+from amaranth import *
+from amaranth.sim import Simulator
+from amaranth.build import *
+from amaranth.cli import main
+from amaranth.hdl.ast import Past, Rose, Fell
 
 from collections import namedtuple
 from math import ceil

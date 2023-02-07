@@ -1,9 +1,9 @@
-from nmigen import *
-from nmigen.sim import Simulator, Settle
-from nmigen.build import *
-from nmigen.cli import main
+from amaranth import *
+from amaranth.sim import Simulator, Settle
+from amaranth.build import *
+from amaranth.cli import main
 from collections.abc import Iterable
-from nmigen.hdl.ast import Statement
+from amaranth.hdl.ast import Statement
 
 import unittest
 

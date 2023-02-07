@@ -9,7 +9,7 @@ license = "BSD"
 python = "^3.7"
 numpy = "^1"
 luna = {git = "https://github.com/greatscottgadgets/luna.git", branch = "main"}
-nmigen = {git = "https://github.com/nmigen/nmigen.git"}
+amaranth = {git = "https://github.com/amaranth-lang/amaranth.git", branch = "main"}
 
 
 [tool.poetry.dev-dependencies]
