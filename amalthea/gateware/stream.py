@@ -1,6 +1,6 @@
 from luna.gateware.stream import StreamInterface
-from nmigen import *
-from nmigen.lib.fifo import SyncFIFO
+from amaranth import *
+from amaranth.lib.fifo import SyncFIFO
 
 class IQStream(StreamInterface):
     def __init__(self, sample_depth=13):

@@ -1,6 +1,6 @@
-from nmigen import *
-from nmigen.sim import *
-from nmigen_soc.wishbone import Interface
+from amaranth import *
+from amaranth.sim import *
+from amaranth_soc.wishbone import Interface
 import unittest
 
 from .stream import SampleStream

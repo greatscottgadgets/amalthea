@@ -26,9 +26,9 @@ setup(
     include_package_data=True,
     python_requires="~=3.7",
     install_requires=[
-        'nmigen @ git+https://github.com/nmigen/nmigen.git',
-        'nmigen_boards @ git+https://github.com/nmigen/nmigen-boards.git',
-        'nmigen_soc @ git+https://github.com/nmigen/nmigen-soc.git',
+        'amaranth @ git+https://github.com/amaranth-lang/amaranth.git',
+        'amaranth_boards @ git+https://github.com/amaranth-lang/amaranth-boards.git',
+        'amaranth_soc @ git+https://github.com/amaranth-lang/amaranth-soc.git',
         'luna @ git+https://github.com/greatscottgadgets/luna.git',
     ],
     setup_requires=['setuptools', 'setuptools_scm'],

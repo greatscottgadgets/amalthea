@@ -1,7 +1,7 @@
-from nmigen import *
-from nmigen import tracer
-from nmigen.hdl.mem import *
-from nmigen.sim import *
+from amaranth import *
+from amaranth import tracer
+from amaranth.hdl.mem import *
+from amaranth.sim import *
 from .fixed_point import FixedPointConst, FixedPointValue, Q
 
 import cmath

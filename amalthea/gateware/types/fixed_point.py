@@ -1,5 +1,5 @@
-from nmigen import Cat, Const, Module, Shape, Signal, Value, tracer
-from nmigen.sim import Simulator
+from amaranth import Cat, Const, Module, Shape, Signal, Value, tracer
+from amaranth.sim import Simulator
 import unittest
 
 

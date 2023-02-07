@@ -1,7 +1,7 @@
 Introduction
 ============
 
-HybridSDR is a toolkit for building software-defined radio systems containing a mixture of software running on a general-purpose computer and gateware running an an FPGA. It allows the user to connect signal processing blocks graphically. Then, at runtime, the gateware design is assembled using the flexibility of `nMigen <https://github.com/nmigen/nmigen>`_. 
+HybridSDR is a toolkit for building software-defined radio systems containing a mixture of software running on a general-purpose computer and gateware running an an FPGA. It allows the user to connect signal processing blocks graphically. Then, at runtime, the gateware design is assembled using the flexibility of `Amaranth <https://github.com/amaranth-lang/amaranth>`_. 
 
 Crossings between the gateware and software domains are handled seamlessly. At runtime a custom USB device is built in gateware using `LUNA <https://github.com/greatscottgadgets/luna>`_.
 

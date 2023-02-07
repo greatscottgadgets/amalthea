@@ -1,6 +1,6 @@
-from nmigen import *
-from nmigen.hdl.dsl import _ModuleBuilderSubmodules
-from nmigen.sim import Simulator, Settle
+from amaranth import *
+from amaranth.hdl.dsl import _ModuleBuilderSubmodules
+from amaranth.sim import Simulator, Settle
 from .types.complex import Complex, ComplexConst
 from .types.fixed_point import Q
 from .util import variable_rotate_left

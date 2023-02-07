@@ -1,5 +1,5 @@
-from nmigen import *
-from nmigen.back import cxxrtl
+from amaranth import *
+from amaranth.back import cxxrtl
 
 import cmath
 import math

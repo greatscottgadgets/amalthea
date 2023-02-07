@@ -35,7 +35,7 @@ Block details
 Device block
 ^^^^^^^^^^^^
 
-The HybridSDR device block (`Amalthea device` in this example) represents the external FPGA device and would contain parameters for configuring it/connecting to it. It contains the top-level nMigen design, the callbacks for registering blocks/connections, and handles the host-side USB streaming when the flowgraph runs.
+The HybridSDR device block (`Amalthea device` in this example) represents the external FPGA device and would contain parameters for configuring it/connecting to it. It contains the top-level Amaranth design, the callbacks for registering blocks/connections, and handles the host-side USB streaming when the flowgraph runs.
 
 HybridSDR domain
 ^^^^^^^^^^^^^^^^
@@ -64,9 +64,9 @@ This also defines how connections should be made between different domains:
 Gateware blocks
 ^^^^^^^^^^^^^^^
 
-These are blocks that represent functionality targeted at the FPGA. Here, `Amalthea RX` represents the radio receiver on the Amalthea device and is a source of samples. `Amalthea Demod` represents an nMigen module implementing amplitude, frequency, and phase demodulation.
+These are blocks that represent functionality targeted at the FPGA. Here, `Amalthea RX` represents the radio receiver on the Amalthea device and is a source of samples. `Amalthea Demod` represents an Amaranth HDL module implementing amplitude, frequency, and phase demodulation.
 
-Blocks are implemented as standard nMigen modules, using nMigen/LUNA stream interfaces for input and output. Blocks are defined and exposed to GNU Radio Companion using standard GNU Radio YAML configuration files. This configuration includes a template for instantiation which registers the block with the `Device block`:
+Blocks are implemented as standard Amaranth HDL modules, using Amaranth/LUNA stream interfaces for input and output. Blocks are defined and exposed to GNU Radio Companion using standard GNU Radio YAML configuration files. This configuration includes a template for instantiation which registers the block with the `Device block`:
 
 ::
 
@@ -120,7 +120,7 @@ This builds the gatware and programs the Amalthea device, waits for it to start 
 Other buses
 -----------
 
-By default, HybridSDR designs use nMigen/LUNA stream interfaces between blocks. However, by using the same techniques above to design custom sample domains & connection behaviour, other bus standards can be supported and interconnected.
+By default, HybridSDR designs use Amaranth/LUNA stream interfaces between blocks. However, by using the same techniques above to design custom sample domains & connection behaviour, other bus standards can be supported and interconnected.
 
 An example block implementing a pipelined Wishbone interface is included. The domain definition includes a template for inserting an adapter module so that it can interface with the LUNA USB stream interface:
 
