@@ -7,7 +7,10 @@ license = "BSD"
 
 [tool.poetry.dependencies]
 python = "^3.7"
-numpy = "^1"
+numpy = [
+    {version = "^1", python = ">=3.7,<3.8"},
+    {version = "^1.24", python = ">=3.8"}
+]
 luna = {git = "https://github.com/greatscottgadgets/luna.git", branch = "main"}
 amaranth = {git = "https://github.com/amaranth-lang/amaranth.git", branch = "main"}
 
